@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA 結構原型 — 全站導覽</title>
+<style>
+  :root{
+    --header-gray:#d9d9d9;
+    --intent-gray:#f3f0eb;
+    --hero-gray:#f2f2f2;
+    --dark:#333333;
+    --dark-2:#2b2b2b;
+    --text:#1a1a1a;
+    --muted:#8a8a8a;
+    --muted-2:#a3a3a3;
+    --border:#e0ddd6;
+    --border-2:#d6d6d6;
+    --white:#ffffff;
+    --header-h-utility:38px;
+    --header-h-nav:72px;
+    --content-max:1400px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'LINE Seed Sans TW','PingFang TC','Microsoft JhengHei',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--text);
+    background:#fff;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;margin:0;padding:0;}
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
+
+  /* ---------- Header ---------- */
+  .site-header{position:sticky;top:0;z-index:1000;background:var(--header-gray);}
+  .utility-bar{background:#fff;border-bottom:1px solid var(--border-2);height:var(--header-h-utility);}
+  .utility-inner{
+    max-width:var(--content-max);margin:0 auto;height:100%;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;
+  }
+  .utility-left{display:flex;gap:18px;}
+  .utility-left a{font-size:12px;color:var(--muted);border-bottom:1px dashed var(--muted-2);}
+  .utility-left a:hover{color:var(--text);}
+  .utility-right{display:flex;gap:24px;}
+  .utility-right a{display:flex;align-items:center;gap:6px;font-size:13px;color:#555;}
+  .utility-right a:hover{color:var(--text);}
+
+  .main-nav{height:var(--header-h-nav);background:var(--header-gray);}
+  .main-nav-inner{
+    max-width:var(--content-max);margin:0 auto;height:100%;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;
+  }
+  .logo{
+    background:var(--dark-2);color:#fff;font-size:14px;
+    padding:10px 22px;border-radius:2px;letter-spacing:.5px;
+  }
+  .nav-list{display:flex;align-items:center;gap:34px;}
+  .nav-item{
+    font-size:15px;font-weight:600;color:var(--text);
+    display:flex;align-items:center;gap:4px;padding:10px 2px;position:relative;
+  }
+  .nav-item .chev{transition:transform .15s ease;opacity:.7;}
+  .nav-item[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  li.nav-li.active > .nav-item{color:var(--text);}
+  li.nav-li.active > .nav-item::after{
+    content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--dark-2);
+  }
+  .nav-toggle{display:none;font-size:14px;font-weight:600;align-items:center;gap:6px;}
+
+  /* ---------- Mega panel ---------- */
+  .mega-panel{
+    position:absolute;left:0;right:0;top:100%;
+    max-width:var(--content-max);margin:0 auto;width:100%;
+    opacity:0;visibility:hidden;transform:translateY(-6px);
+    transition:opacity .15s ease, transform .15s ease, visibility .15s;
+    background:#fff;box-shadow:0 18px 36px rgba(0,0,0,.12);
+    border-bottom:1px solid var(--border-2);
+  }
+  .mega-panel.open{opacity:1;visibility:visible;transform:translateY(0);}
+  .panel-grid{display:flex;padding:0 48px;}
+  .panel-intent{
+    background:var(--intent-gray);width:358px;min-width:280px;flex-shrink:0;
+    padding:28px 28px;margin-left:-48px;padding-left:76px;
+  }
+  .panel-intent .intent-heading{font-size:14px;font-weight:600;color:#4a4a4a;margin:0 0 18px;line-height:1.5;}
+  .intent-row{display:flex;align-items:center;gap:14px;padding:10px 0;}
+  .intent-row .icon-badge{
+    width:38px;height:38px;border-radius:50%;background:var(--dark-2);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .intent-row .intent-text{font-size:15px;font-weight:600;}
+  .intent-row:hover .intent-text{text-decoration:underline;}
+
+  .panel-columns{display:flex;gap:56px;padding:28px 40px;flex-wrap:wrap;}
+  .panel-col{min-width:170px;}
+  .panel-col h4{font-size:13px;font-weight:700;color:#555;margin:0 0 14px;letter-spacing:.3px;}
+  .panel-col .row{
+    display:block;font-size:14px;padding:9px 0;border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  .panel-col .row:hover{color:var(--dark-2);text-decoration:underline;}
+  .pill-btn{
+    display:inline-block;margin-top:16px;background:var(--dark-2);color:#fff;
+    font-size:13px;font-weight:600;padding:10px 22px;border-radius:22px;white-space:nowrap;
+  }
+  .pill-btn:hover{background:#000;}
+
+  /* ---------- Mobile / narrow nav ---------- */
+  .mobile-nav{display:none;background:#fff;border-top:1px solid var(--border-2);
+    max-height:70vh;overflow:auto;}
+  .mobile-nav .m-section{padding:14px 20px;border-bottom:1px solid var(--border);}
+  .mobile-nav .m-top{font-size:15px;font-weight:700;display:block;margin-bottom:6px;}
+  .mobile-nav .m-sub{font-size:13px;color:#555;padding:6px 0 6px 12px;display:block;}
+
+  /* ---------- Hero / page template ---------- */
+  .hero{
+    background:var(--hero-gray);min-height:550px;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    padding:60px 24px;text-align:center;
+  }
+  .hero-title{
+    font-size:56px;font-weight:700;line-height:1.28;max-width:920px;margin:0;
+  }
+  .hero-path{font-size:13px;color:var(--muted);margin-top:28px;letter-spacing:.3px;}
+  .breadcrumb{font-size:13px;color:var(--muted);margin-top:8px;}
+  .breadcrumb a{border-bottom:1px solid transparent;}
+  .breadcrumb a:hover{border-bottom-color:var(--muted);color:var(--text);}
+  .breadcrumb .sep{margin:0 6px;color:var(--muted-2);}
+  .guessed-badge{
+    display:inline-block;margin-top:14px;font-size:12px;color:#8a6d00;
+    border:1px dashed #c9a94a;background:#fbf6e8;padding:4px 12px;border-radius:12px;
+  }
+  .children-line{font-size:13px;color:#6b6b6b;margin-top:18px;max-width:640px;}
+  .children-line b{color:#4a4a4a;font-weight:600;margin-right:6px;}
+  .children-line a{border-bottom:1px solid var(--border-2);}
+  .children-line a:hover{color:var(--text);border-bottom-color:var(--text);}
+  .below-space{height:80px;}
+
+  /* ---------- Listing sections (grouped: /blog) ---------- */
+  .listing-wrap{max-width:var(--content-max);margin:0 auto;padding:56px 48px 100px;}
+  .listing-group{margin-bottom:56px;}
+  .listing-group-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+  .listing-group-head h2{font-size:30px;font-weight:700;margin:0;}
+  .listing-all-link{font-size:14px;color:var(--text);border-bottom:1px solid transparent;}
+  .listing-all-link:hover{border-bottom-color:var(--text);}
+  .listing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .listing-card{aspect-ratio:0.86;background:var(--header-gray);}
+
+  /* ---------- Overview cards (/resources, /locations) ---------- */
+  .overview-wrap{max-width:var(--content-max);margin:0 auto;padding:100px 48px;display:flex;gap:40px;flex-wrap:wrap;justify-content:center;}
+  .overview-card{
+    flex:1 1 280px;max-width:600px;aspect-ratio:1.6;background:var(--header-gray);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;color:var(--text);transition:background .15s ease;
+  }
+  .overview-card:hover{background:var(--border-2);}
+
+  @media (max-width:1024px){
+    .listing-grid{grid-template-columns:repeat(2,1fr);}
+    .overview-wrap{padding:56px 20px;}
+  }
+
+  /* ---------- Course grid + feature split (/adults landing) ---------- */
+  .course-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .course-card{
+    aspect-ratio:0.86;background:var(--header-gray);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:20px;padding:16px;transition:background .15s ease;
+  }
+  .course-card:hover{background:var(--border-2);}
+  .feature-split{display:flex;gap:56px;align-items:center;margin-top:72px;}
+  .feature-split .feature-image{flex:1 1 50%;aspect-ratio:1.5;background:var(--header-gray);}
+  .feature-split .feature-text{flex:1 1 50%;display:flex;flex-direction:column;gap:22px;}
+  .feature-split .feature-text h3{font-size:26px;font-weight:700;margin:0;}
+  .feature-split .feature-text p{font-size:15px;line-height:1.8;color:#444;margin:0;}
+  .feature-split .feature-btn{
+    align-self:flex-start;background:var(--header-gray);color:#888;
+    font-size:14px;padding:12px 26px;border-radius:22px;
+  }
+  .feature-split .feature-btn:hover{background:var(--border-2);}
+
+  @media (max-width:1024px){
+    .course-grid{grid-template-columns:repeat(2,1fr);}
+    .feature-split{flex-direction:column;}
+  }
+
+  /* ---------- Sitemap page ---------- */
+  .doc-wrap{max-width:900px;margin:0 auto;padding:56px 24px 100px;}
+  .doc-wrap h1{font-size:28px;margin:0 0 8px;}
+  .doc-wrap .doc-sub{color:var(--muted);font-size:14px;margin-bottom:36px;}
+  .tree{margin-left:0;}
+  .tree ul{margin-left:22px;border-left:1px dashed var(--border-2);padding-left:18px;margin-top:6px;}
+  .tree li{margin:4px 0;}
+  .tree .node{
+    display:inline-flex;align-items:center;gap:8px;font-size:14px;padding:4px 8px;border-radius:4px;
+  }
+  .tree .node:hover{background:#f5f5f5;}
+  .tree .url{color:var(--muted);font-size:12px;}
+  .tree .flag{
+    font-size:10px;font-weight:700;color:#8a6d00;background:#fbf6e8;border:1px solid #e8d8a0;
+    padding:1px 7px;border-radius:9px;
+  }
+  .tree .dup-flag{
+    font-size:10px;color:#8a3b3b;background:#fbe9e9;border:1px solid #eec2c2;
+    padding:1px 7px;border-radius:9px;
+  }
+
+  /* ---------- Nav mapping page ---------- */
+  .map-wrap{max-width:1100px;margin:0 auto;padding:56px 24px 100px;}
+  .map-wrap h1{font-size:28px;margin:0 0 8px;}
+  .map-wrap .doc-sub{color:var(--muted);font-size:14px;margin-bottom:16px;}
+  .map-note{
+    font-size:13px;color:#6b5b1e;background:#fbf6e8;border:1px solid #e8d8a0;
+    padding:10px 16px;border-radius:6px;margin-bottom:28px;
+  }
+  table.nav-table{width:100%;border-collapse:collapse;margin-bottom:44px;font-size:13.5px;}
+  table.nav-table caption{text-align:left;font-size:16px;font-weight:700;margin-bottom:10px;caption-side:top;}
+  table.nav-table th, table.nav-table td{
+    text-align:left;padding:10px 12px;border-bottom:1px solid var(--border-2);vertical-align:top;
+  }
+  table.nav-table th{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #bbb;}
+  table.nav-table td.url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#333;}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap;}
+  .tag-直連{background:#eef1ee;color:#3a5a3a;border:1px solid #c9d8c9;}
+  .tag-改名{background:#f1eef7;color:#4a3a6b;border:1px solid #d8cbe8;}
+  .tag-提升至頂層{background:#eef2f8;color:#2f4f7a;border:1px solid #c6d6ea;}
+  .tag-待確認{background:#fbf6e8;color:#8a6d00;border:1px dashed #d8bf6a;}
+  .unreachable-box{
+    border:1px solid var(--border-2);border-radius:8px;padding:20px 24px;background:#fafafa;
+  }
+  .unreachable-box h2{font-size:16px;margin:0 0 6px;}
+  .unreachable-box p.hint{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .unreachable-box ul{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;}
+  .unreachable-box li{font-size:13.5px;}
+  .unreachable-box code{font-size:12px;color:#666;}
+  .back-link{display:inline-block;margin-bottom:28px;font-size:13px;color:var(--muted);}
+  .back-link:hover{color:var(--text);}
+
+  @media (max-width:1024px){
+    .nav-list{display:none;}
+    .nav-toggle{display:flex;}
+    .mega-panel{display:none !important;}
+    .panel-intent{padding-left:28px;margin-left:0;width:100%;}
+    .utility-inner,.main-nav-inner{padding:0 20px;}
+    .hero-title{font-size:38px;}
+    .hero{min-height:380px;padding:40px 20px;}
+    .unreachable-box ul{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="utility-bar">
+    <div class="utility-inner">
+      <div class="utility-left">
+        <a href="#/sitemap">網站地圖 Sitemap</a>
+      </div>
+      <div class="utility-right">
+        <a href="#/member">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+          會員登入
+        </a>
+        <a href="#/cart">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+          購物車
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="main-nav">
+    <div class="main-nav-inner">
+      <a href="#/" class="logo">logo</a>
+      <nav><ul class="nav-list" id="navList"></ul></nav>
+      <button class="nav-toggle" id="navToggle" aria-label="選單">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        選單
+      </button>
+    </div>
+    <div class="mega-panel" id="megaPanel"></div>
+  </div>
+  <div class="mobile-nav" id="mobileNav"></div>
+</header>
+
+<main id="app"></main>
+
+<script>
+/* =====================================================================
+   DATA
+===================================================================== */
+
+const ICONS = {
+  gift: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 8h18M12 8v13M12 8c-1.8-4-7-4-7 0s5.2 4 7 0zM12 8c1.8-4 7-4 7 0s-5.2 4-7 0z"/></svg>`,
+  pin: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.6 7-12.3A7 7 0 105 9.7C5 14.4 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.3"/></svg>`
+};
+
+// Top-level nav bar, left to right per screenshots
+const TOP_NAV = [
+  {type:'menu', key:'about',     label:'認識我們'},
+  {type:'link', label:'最新消息', url:'/news'},
+  {type:'menu', key:'kids',      label:'兒童課程'},
+  {type:'menu', key:'adults',    label:'成人課程'},
+  {type:'menu', key:'materials', label:'精選教材'},
+  {type:'link', label:'部落格',   url:'/blog'},
+];
+
+// Mega menu contents. Every item may carry {tag, note} used to auto-build the nav-mapping table.
+const MENU_DATA = {
+  about: {
+    label:'認識我們',
+    intent:{
+      heading:'不確定從哪開始？找到適合孩子的路：',
+      items:[
+        {icon:'gift', text:'活動回顧', url:'/blog/events', tag:'直連'},
+        {icon:'pin',  text:'所有課程', url:'/kids', tag:'改名', note:'選單「所有課程」／頁面標題「所有兒童課程」'},
+      ]
+    },
+    columns:[
+      {heading:'認識我們', items:[
+        {text:'什麼是 Science of Reading (SoR)', url:'/about-sor', tag:'改名', note:'選單多加註「(SoR)」／頁面標題「什麼是 Science of Reading」'},
+        {text:'SoR testing 認證架構', url:'/certification', tag:'直連'},
+        {text:'認識創辦人', url:'/founder', tag:'改名', note:'選單「認識創辦人」／頁面標題「創辦人介紹:蕭文乾博士」'},
+      ]}
+    ]
+  },
+  kids: {
+    label:'兒童課程',
+    intent:{
+      heading:'不確定從哪開始？找到適合孩子的路：',
+      items:[
+        {icon:'gift', text:'免費試看', url:'/resources/kids', tag:'直連'},
+        {icon:'pin',  text:'實體教室總覽', url:'/locations', tag:'直連'},
+        {icon:'pin',  text:'常見問題', url:'/kids/faq', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      ]
+    },
+    columns:[
+      {heading:'線上課程', items:[
+        {text:'SoR 拼讀小達人', url:'/kids/phonics', tag:'直連'},
+        {text:'SoR 造句小巨人', url:'/kids/vocabulary', tag:'改名', note:'選單「SoR 造句小巨人」／頁面標題「SoR 單字小達人」'},
+        {text:'SoR 閱讀小傳人', url:'/kids/reading', tag:'改名', note:'選單「SoR 閱讀小傳人」／頁面標題「SoR 閱讀小達人」'},
+      ], pill:{text:'所有兒童課程', url:'/kids', tag:'直連'}},
+      {heading:'加盟教室', items:[
+        {text:'臺北旗艦殿', url:'/locations/taipei', tag:'直連'},
+        {text:'桃園旗艦殿', url:'/locations/taoyuan', tag:'直連'},
+        {text:'高雄旗艦殿', url:'/locations/kaohsiung', tag:'直連'},
+      ]},
+      {heading:'認證', items:[
+        {text:'教學成果', url:'/kids/outcome', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      ]},
+    ]
+  },
+  adults: {
+    label:'成人課程',
+    intent:{
+      heading:'想先免費體驗？',
+      items:[
+        {icon:'gift', text:'英文語調免費試上', url:'/resources/adults', tag:'改名', note:'選單「英文語調免費試上」／頁面標題「成人線上課程」'},
+        {icon:'pin',  text:'常見問題', url:'/adults/faq', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      ]
+    },
+    columns:[
+      {heading:'線上課程', items:[
+        {text:'發音聽力三秒教', url:'/adults/pronunciation', tag:'直連'},
+        {text:'蕭博士專利語調課', url:'/adults/master-class', tag:'直連'},
+        {text:'專利字典拼讀班', url:'/adults/phonics', tag:'直連'},
+        {text:'發音聽力矯正班', url:'/adults/adult-pronunciation', tag:'直連'},
+      ], pill:{text:'所有成人課程', url:'/adults', tag:'直連'}},
+      {heading:'就業培訓', items:[
+        {text:'師資培訓（正音師之路）', url:'/adults/teacher-training', tag:'直連'},
+      ]},
+      {heading:'認證', items:[
+        {text:'教學成果', url:'/adults/outcome', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      ]},
+    ]
+  },
+  materials: {
+    label:'精選教材',
+    intent:{
+      heading:'還不認識 SoR？從這裡開始',
+      items:[
+        {icon:'gift', text:'所有兒童課程', url:'/kids', tag:'直連'},
+        {icon:'pin',  text:'部落格', url:'/blog', tag:'直連'},
+      ]
+    },
+    columns:[
+      {heading:'教材', items:[
+        {text:'SoR 原創教材商店', url:'/shop', tag:'直連'},
+        {text:'點讀專區（4 子頁）', url:'/mi-pen', tag:'直連', note:'sitemap 僅列出父頁，未列出選單標註的 4 個子頁'},
+        {text:'勘誤專區', url:'/support/errata', tag:'直連'},
+        {text:'免費資源', url:'/resources', tag:'直連'},
+      ]},
+    ]
+  },
+};
+
+const DIRECT_LINKS = [
+  {menu:'最新消息 (頂層)', text:'最新消息', url:'/news', tag:'直連', note:'頁面內容來源為 blog 貼文（sitemap 標註 [fetch from blog post]）'},
+  {menu:'部落格 (頂層)', text:'部落格', url:'/blog', tag:'直連'},
+];
+
+// crumb helpers
+const c  = (u,l)=>({u,l});
+const cur = (l)=>({l});
+
+// PAGES: every real sitemap URL. heroTitle = big band text, label = short name used elsewhere.
+const PAGES = {
+  '/': {label:'首頁', heroTitle:'首頁', crumbs:[cur('首頁')]},
+
+  '/about-sor': {label:'什麼是 Science of Reading', heroTitle:'什麼是 Science of Reading',
+    crumbs:[c('/','首頁'), cur('認識我們'), cur('什麼是 Science of Reading')]},
+  '/certification': {label:'SoR testing 認證架構', heroTitle:'SoR testing 認證架構',
+    crumbs:[c('/','首頁'), cur('認識我們'), cur('SoR testing 認證架構')]},
+  '/founder': {label:'創辦人介紹:蕭文乾博士', heroTitle:'創辦人介紹:蕭文乾博士',
+    crumbs:[c('/','首頁'), cur('認識我們'), cur('創辦人介紹:蕭文乾博士')]},
+
+  '/news': {label:'最新消息', heroTitle:'最新消息', crumbs:[c('/','首頁'), cur('最新消息')]},
+  '/blog/events': {label:'活動紀錄', heroTitle:'活動紀錄',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('活動紀錄')]},
+  '/blog/media': {label:'媒體報導', heroTitle:'媒體報導',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('媒體報導')]},
+
+  '/kids': {label:'所有兒童課程', heroTitle:'所有兒童課程', crumbs:[c('/','首頁'), cur('所有兒童課程')]},
+  '/kids/phonics': {label:'SoR 拼讀小達人', heroTitle:'兒童課程/SoR 拼讀小達人',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 拼讀小達人')]},
+  '/kids/vocabulary': {label:'SoR 單字小達人', heroTitle:'兒童課程/SoR 單字小達人',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 單字小達人')]},
+  '/kids/reading': {label:'SoR 閱讀小達人', heroTitle:'兒童課程/SoR 閱讀小達人',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 閱讀小達人')]},
+  '/kids/outcome': {label:'教學成果', heroTitle:'兒童課程/教學成果',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教學成果')]},
+  '/kids/faq': {label:'常見問題', heroTitle:'兒童課程/常見問題',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('常見問題')]},
+
+  '/locations': {label:'旗艦殿總覽', heroTitle:'旗艦殿總覽',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('旗艦殿總覽')]},
+  '/locations/taipei': {label:'台北旗艦殿', heroTitle:'旗艦殿總覽/ 台北旗艦殿',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('台北旗艦殿')]},
+  '/locations/taoyuan': {label:'桃園旗艦殿', heroTitle:'旗艦殿總覽/ 桃園旗艦殿',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('桃園旗艦殿')]},
+  '/locations/kaohsiung': {label:'高雄旗艦殿', heroTitle:'旗艦殿總覽/ 高雄旗艦殿',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('高雄旗艦殿')]},
+
+  '/adults': {label:'所有成人課程', heroTitle:'所有成人課程', crumbs:[c('/','首頁'), cur('所有成人課程')]},
+  '/adults/pronunciation': {label:'發音聽力三秒教', heroTitle:'成人課程/發音聽力三秒教',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('發音聽力三秒教')]},
+  '/adults/master-class': {label:'蕭博士專利語調課', heroTitle:'成人課程/蕭博士專利語調課',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('蕭博士專利語調課')]},
+  '/adults/phonics': {label:'專利字典拼讀班', heroTitle:'成人課程/專利字典拼讀班',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('專利字典拼讀班')]},
+  '/adults/adult-pronunciation': {label:'發音聽力矯正班', heroTitle:'成人課程/發音聽力矯正班',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('發音聽力矯正班')]},
+  '/adults/teacher-training': {label:'師資培訓(正音師之路)', heroTitle:'成人課程/師資培訓(正音師之路)',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('師資培訓(正音師之路)')]},
+  '/adults/online': {label:'成人線上課程', heroTitle:'成人課程/成人線上課程',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('成人線上課程')]},
+  '/adults/outcome': {label:'教學成果', heroTitle:'成人課程/教學成果',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('教學成果')]},
+  '/adults/faq': {label:'常見問題', heroTitle:'成人課程/常見問題',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('常見問題')]},
+
+  '/resources': {label:'免費資源', heroTitle:'免費資源',
+    crumbs:[c('/','首頁'), cur('精選教材'), cur('免費資源')]},
+  '/resources/kids': {label:'免費課程/免費試上', heroTitle:'免費資源/兒童免費課程,免費試上',
+    crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程/免費試上')]},
+  '/resources/adults': {label:'免費課程', heroTitle:'免費資源/免費課程',
+    crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程')]},
+
+  '/blog': {label:'所有部落格文章', heroTitle:'所有部落格文章', crumbs:[c('/','首頁'), cur('所有部落格文章')]},
+  '/blog/latest': {label:'公告', heroTitle:'公告',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('公告')]},
+  '/blog/article': {label:'冷流量文章', heroTitle:'冷流量文章',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('冷流量文章')]},
+
+  '/shop': {label:'SoR 原創教材商店', heroTitle:'SoR 原創教材商店',
+    crumbs:[c('/','首頁'), cur('精選教材'), cur('SoR 原創教材商店')]},
+  '/mi-pen': {label:'點讀專區', heroTitle:'點讀專區',
+    crumbs:[c('/','首頁'), cur('精選教材'), cur('點讀專區')]},
+  '/support/errata': {label:'勘誤專區', heroTitle:'勘誤專區',
+    crumbs:[c('/','首頁'), cur('精選教材'), cur('勘誤專區')]},
+
+  '/member': {label:'會員專區', heroTitle:'會員專區(需登入)', crumbs:[c('/','首頁'), cur('會員專區')],
+    note:'登入後子頁沿用現有系統：訂單／優惠券／金鑰／影音課程'},
+};
+
+// EXTRA: pages that exist only because a menu item had no sitemap match (待確認)
+const EXTRA_PAGES = {
+  '/resources/guide': {label:'五階段選書指南', heroTitle:'五階段選書指南', guessed:true,
+    crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('五階段選書指南')]},
+  '/resources/self-study': {label:'4-5歲自學方案', heroTitle:'4-5歲自學方案', guessed:true,
+    crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('4-5歲自學方案')]},
+  '/cart': {label:'購物車', heroTitle:'購物車', crumbs:[c('/','首頁'), cur('購物車')]},
+};
+
+const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
+
+// Extra section content rendered below the hero on listing/overview pages.
+// 'grouped' = section heading + "所有文章" link (to real sitemap URL) + placeholder image grid.
+// 'cards'   = large clickable overview cards, each linking straight to a real sitemap URL.
+const LISTING_SECTIONS = {
+  '/blog': {type:'grouped', groups:[
+    {title:'公告',     url:'/blog/latest', count:4},
+    {title:'活動紀錄',  url:'/blog/events', count:4},
+    {title:'冷流量文章', url:'/blog/article', count:4},
+  ]},
+  '/resources': {type:'cards', cards:[
+    {title:'成人學習資源', url:'/resources/adults'},
+    {title:'兒童學習資源', url:'/resources/kids'},
+  ]},
+  '/locations': {type:'cards', cards:[
+    {title:'台北旗艦殿', url:'/locations/taipei'},
+    {title:'桃園旗艦殿', url:'/locations/taoyuan'},
+    {title:'高雄旗艦殿', url:'/locations/kaohsiung'},
+  ]},
+  '/kids': {type:'cards', cards:[
+    {title:'SoR 拼讀小達人', url:'/kids/phonics'},
+    {title:'SoR 單字小達人', url:'/kids/vocabulary'},
+    {title:'SoR 閱讀小達人', url:'/kids/reading'},
+  ]},
+  '/adults': {type:'courses', heading:'線上課程', cards:[
+    {title:'發音聽力三秒教', url:'/adults/pronunciation'},
+    {title:'蕭博士專利語調課', url:'/adults/master-class'},
+    {title:'專利字典拼讀班', url:'/adults/phonics'},
+    {title:'發音聽力矯正班', url:'/adults/adult-pronunciation'},
+  ], feature:{
+    title:'就業培訓',
+    body:'我們為希望成為正音師的夥伴提供全面的師資培訓計劃，內容包括基於研究的教學策略，旨在提升教學示範的質量，並確保培訓的有效性。',
+    url:'/adults/teacher-training',
+    btnText:'了解正音師之路課程',
+  }},
+};
+
+function renderListingExtra(url){
+  const cfg = LISTING_SECTIONS[url];
+  if(!cfg) return '';
+  if(cfg.type === 'grouped'){
+    return `<div class="listing-wrap">${cfg.groups.map(g=>`
+      <section class="listing-group">
+        <div class="listing-group-head">
+          <h2>${g.title}</h2>
+          <a class="listing-all-link" href="#${g.url}">所有文章 ›</a>
+        </div>
+        <div class="listing-grid">
+          ${Array.from({length:g.count}).map(()=>'<div class="listing-card"></div>').join('')}
+        </div>
+      </section>
+    `).join('')}</div>`;
+  }
+  if(cfg.type === 'cards'){
+    return `<div class="overview-wrap">
+      ${cfg.cards.map(c=>`<a class="overview-card" href="#${c.url}">${c.title}</a>`).join('')}
+    </div>`;
+  }
+  if(cfg.type === 'courses'){
+    return `<div class="listing-wrap">
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.heading}</h2></div>
+        <div class="course-grid">
+          ${cfg.cards.map(c=>`<a class="course-card" href="#${c.url}">${c.title}</a>`).join('')}
+        </div>
+      </section>
+      <section class="feature-split">
+        <div class="feature-image"></div>
+        <div class="feature-text">
+          <h3>${cfg.feature.title}</h3>
+          <p>${cfg.feature.body}</p>
+          <a class="feature-btn" href="#${cfg.feature.url}">${cfg.feature.btnText}</a>
+        </div>
+      </section>
+    </div>`;
+  }
+  return '';
+}
+
+// Literal sitemap.txt tree, preserved as-is (including its duplicate-listing quirks)
+const SITE_TREE = [
+  {u:'/', l:'首頁', children:[
+    // /about was removed as a page in sitemap.txt — its former children now sit as flat URLs.
+    {u:'/about-sor', l:'什麼是 Science of Reading'},
+    {u:'/certification', l:'SoR testing 認證架構'},
+    {u:'/founder', l:'創辦人介紹:蕭文乾博士'},
+    {u:'/news', l:'最新消息', flag:'fetch from blog post', 
+    },
+    {u:'/kids', l:'所有兒童課程', flag:'Landing page', children:[
+      {u:'/kids/phonics', l:'SoR 拼讀小達人'},
+      {u:'/kids/vocabulary', l:'SoR 單字小達人'},
+      {u:'/kids/reading', l:'SoR 閱讀小達人'},
+      {u:'/locations', l:'旗艦殿', flag:'Landing page', children:[
+        {u:'/locations/taipei', l:'台北旗艦殿'},
+        {u:'/locations/taoyuan', l:'桃園旗艦殿'},
+        {u:'/locations/kaohsiung', l:'高雄旗艦殿'},
+      ]},
+      {u:'/kids/outcome', l:'教學成果'},
+      {u:'/kids/faq', l:'常見問題'},
+    ]},
+    {u:'/adults', l:'成人課程', flag:'Landing page', children:[
+      {u:'/adults/pronunciation', l:'發音聽力三秒教'},
+      {u:'/adults/master-class', l:'蕭博士專利語調課'},
+      {u:'/adults/phonics', l:'專利字典拼讀班'},
+      {u:'/adults/adult-pronunciation', l:'發音聽力矯正班'},
+      {u:'/adults/teacher-training', l:'師資培訓(正音師之路)'},
+      {u:'/adults/online', l:'成人線上課程'},
+      {u:'/adults/outcome', l:'成人教學成果'},
+      {u:'/adults/faq', l:'常見問題'},
+    ]},
+    {u:'/resources', l:'免費資源', children:[
+      {u:'/resources/kids', l:'兒童學習資源（免費課程/免費試上）'},
+      {u:'/resources/adults', l:'成人學習資源（免費課程/免費試上）'},
+    ]},
+    {u:'/blog', l:'部落格', children:[
+      {u:'/blog/latest', l:'公告'},
+      {u:'/blog/article', l:'冷流量文章'},
+      {u:'/blog/events', l:'活動紀錄', dup:true},
+    ]},
+    {u:'/shop', l:'SoR 原創教材商店'},
+    {u:'/mi-pen', l:'點讀專區'},
+    {u:'/support/errata', l:'勘誤專區'},
+    {u:'/member', l:'會員專區(需登入)'},
+  ]}
+];
+
+// URLs that exist in the real sitemap (used to compute "not reachable from any menu")
+const SITEMAP_URLS = Object.keys(PAGES);
+
+/* =====================================================================
+   HEADER RENDER + MEGA MENU BEHAVIOUR
+===================================================================== */
+
+const navListEl = document.getElementById('navList');
+const megaPanelEl = document.getElementById('megaPanel');
+const mobileNavEl = document.getElementById('mobileNav');
+const navToggleBtn = document.getElementById('navToggle');
+const siteHeaderEl = document.getElementById('siteHeader');
+
+function buildTopNav(){
+  navListEl.innerHTML = TOP_NAV.map(item=>{
+    if(item.type==='menu'){
+      return `<li class="nav-li" data-key="${item.key}">
+        <button class="nav-item" data-menu-key="${item.key}" aria-haspopup="true" aria-expanded="false">
+          ${item.label}
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </li>`;
+    }
+    return `<li class="nav-li" data-url="${item.url}">
+      <a class="nav-item" href="#${item.url}">${item.label}</a>
+    </li>`;
+  }).join('');
+}
+
+function renderIntentRow(item){
+  return `<a class="intent-row" href="#${item.url}">
+    <span class="icon-badge">${ICONS[item.icon] || ICONS.pin}</span>
+    <span class="intent-text">${item.text}</span>
+  </a>`;
+}
+
+function renderPanelHTML(key){
+  const data = MENU_DATA[key];
+  if(!data) return '';
+  const intentHTML = data.intent ? `
+    <div class="panel-intent">
+      <p class="intent-heading">${data.intent.heading}</p>
+      ${data.intent.items.map(renderIntentRow).join('')}
+    </div>` : '';
+  const colsHTML = data.columns.map(col=>`
+    <div class="panel-col">
+      <h4>${col.heading}</h4>
+      ${col.items.map(it=>`<a class="row" href="#${it.url}">${it.text}</a>`).join('')}
+      ${col.pill ? `<a class="pill-btn" href="#${col.pill.url}">${col.pill.text}</a>` : ''}
+    </div>
+  `).join('');
+  return `<div class="panel-grid">${intentHTML}<div class="panel-columns">${colsHTML}</div></div>`;
+}
+
+let openKey = null, closeTimer = null;
+
+function setAria(){
+  document.querySelectorAll('.nav-item[data-menu-key]').forEach(btn=>{
+    btn.setAttribute('aria-expanded', btn.dataset.menuKey === openKey ? 'true':'false');
+  });
+}
+function openMenu(key){
+  clearTimeout(closeTimer);
+  if(!MENU_DATA[key]) return;
+  openKey = key;
+  megaPanelEl.innerHTML = renderPanelHTML(key);
+  megaPanelEl.classList.add('open');
+  setAria();
+}
+function closePanel(){
+  openKey = null;
+  megaPanelEl.classList.remove('open');
+  setAria();
+}
+function scheduleClose(){
+  clearTimeout(closeTimer);
+  closeTimer = setTimeout(closePanel, 150);
+}
+
+function wireNavInteractions(){
+  document.querySelectorAll('.nav-li').forEach(li=>{
+    const key = li.dataset.key;
+    li.addEventListener('mouseenter', ()=>{
+      if(key) openMenu(key); else closePanel();
+    });
+    li.addEventListener('mouseleave', scheduleClose);
+    const btn = li.querySelector('button.nav-item');
+    if(btn){
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        if(openKey === key) closePanel(); else openMenu(key);
+      });
+    }
+  });
+  megaPanelEl.addEventListener('mouseenter', ()=>clearTimeout(closeTimer));
+  megaPanelEl.addEventListener('mouseleave', scheduleClose);
+
+  document.addEventListener('click', (e)=>{
+    if(!siteHeaderEl.contains(e.target)) closePanel();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){ closePanel(); mobileNavEl.hidden = true; }
+  });
+}
+
+function buildMobileNav(){
+  mobileNavEl.innerHTML = TOP_NAV.map(item=>{
+    if(item.type==='link'){
+      return `<div class="m-section"><a class="m-top" href="#${item.url}">${item.label}</a></div>`;
+    }
+    const data = MENU_DATA[item.key];
+    let subs = [];
+    if(data.intent) subs = subs.concat(data.intent.items.map(i=>({text:i.text,url:i.url})));
+    data.columns.forEach(col=>{
+      subs = subs.concat(col.items.map(i=>({text:`${col.heading} — ${i.text}`,url:i.url})));
+      if(col.pill) subs.push({text:col.pill.text,url:col.pill.url});
+    });
+    return `<div class="m-section">
+      <span class="m-top">${item.label}</span>
+      ${subs.map(s=>`<a class="m-sub" href="#${s.url}">${s.text}</a>`).join('')}
+    </div>`;
+  }).join('');
+}
+navToggleBtn.addEventListener('click', ()=>{ mobileNavEl.hidden = !mobileNavEl.hidden; });
+
+function updateActiveNav(url){
+  const map = [
+    {key:'about', test:u=>['/about-sor','/certification','/founder'].includes(u)},
+    {url:'/news', test:u=>u==='/news'},
+    {key:'kids', test:u=>u.startsWith('/kids')||u.startsWith('/locations')},
+    {key:'adults', test:u=>u.startsWith('/adults')},
+    {key:'materials', test:u=>['/shop','/mi-pen','/support/errata','/resources'].some(p=>u.startsWith(p))},
+    {url:'/blog', test:u=>u.startsWith('/blog')},
+  ];
+  const hit = map.find(m=>m.test(url));
+  document.querySelectorAll('.nav-li').forEach(li=>{
+    const isActive = hit && ((hit.key && li.dataset.key===hit.key) || (hit.url && li.dataset.url===hit.url));
+    li.classList.toggle('active', !!isActive);
+  });
+}
+
+/* =====================================================================
+   PAGE RENDERERS
+===================================================================== */
+
+const app = document.getElementById('app');
+
+function renderBreadcrumb(crumbs){
+  return crumbs.map((cr,i)=>{
+    const isLast = i === crumbs.length-1;
+    const seg = (cr.u && !isLast) ? `<a href="#${cr.u}">${cr.l}</a>` : `<span>${cr.l}</span>`;
+    return i===0 ? seg : `<span class="sep">›</span>${seg}`;
+  }).join('');
+}
+
+function renderHero(url){
+  const page = ALL_PAGES[url];
+  if(!page){
+    app.innerHTML = `<div class="hero"><h1 class="hero-title">找不到頁面</h1>
+      <div class="hero-path">${url}</div>
+      <div class="breadcrumb"><a href="#/">回首頁</a></div></div>`;
+    return;
+  }
+  const guessedHTML = page.guessed ? `<div class="guessed-badge">⚠ 猜測頁面・sitemap 無對應（待確認）</div>` : '';
+  const noteHTML = page.note ? `<div class="children-line">${page.note}</div>` : '';
+  const extraHTML = renderListingExtra(url);
+
+  app.innerHTML = `
+    <section class="hero">
+      <h1 class="hero-title">${page.heroTitle}</h1>
+      <div class="hero-path">${url}</div>
+      <nav class="breadcrumb">${renderBreadcrumb(page.crumbs)}</nav>
+      ${guessedHTML}
+      ${noteHTML}
+    </section>
+    ${extraHTML || '<div class="below-space"></div>'}
+  `;
+}
+
+function renderTreeNode(node){
+  const flag = node.flag ? `<span class="flag">${node.flag}</span>` : '';
+  const dup = node.dup ? `<span class="dup-flag">重複出現於原始 sitemap</span>` : '';
+  const kids = node.children ? `<ul>${node.children.map(renderTreeNode).join('')}</ul>` : '';
+  return `<li>
+    <span class="node">
+      <a href="#${node.u}">${node.l}</a>
+      <span class="url">${node.u}</span>
+      ${flag}${dup}
+    </span>
+    ${kids}
+  </li>`;
+}
+
+function renderSitemapPage(){
+  app.innerHTML = `
+    <div class="doc-wrap">
+      <a class="back-link" href="#/">← 回首頁</a>
+      <h1>網站地圖 Sitemap</h1>
+      <p class="doc-sub">依 sitemap.txt 內容管理視角呈現的完整頁面結構（含原始檔案中的重複項）。點擊任一節點可直接前往該頁面。</p>
+      <div class="tree"><ul>${SITE_TREE.map(renderTreeNode).join('')}</ul></div>
+    </div>
+  `;
+}
+
+function collectMenuRows(){
+  const rows = [];
+  Object.entries(MENU_DATA).forEach(([key,data])=>{
+    if(data.wireframeMissing){
+      rows.push({__banner:`「${data.label}」選單無對應線框稿，以下依 IA 規則與其他選單的視覺樣式推測建置。`});
+    }
+    if(data.intent){
+      data.intent.items.forEach(it=>rows.push({
+        menu:data.label, column:'情境／促銷區', text:it.text, url:it.url, tag:it.tag, note:it.note||''
+      }));
+    }
+    data.columns.forEach(col=>{
+      col.items.forEach(it=>rows.push({
+        menu:data.label, column:col.heading, text:it.text, url:it.url, tag:it.tag, note:it.note||''
+      }));
+      if(col.pill) rows.push({
+        menu:data.label, column:col.heading+'（按鈕）', text:col.pill.text, url:col.pill.url, tag:col.pill.tag, note:col.pill.note||''
+      });
+    });
+  });
+  DIRECT_LINKS.forEach(dl=>rows.push({
+    menu:dl.menu, column:'—', text:dl.text, url:dl.url, tag:dl.tag, note:dl.note||''
+  }));
+  return rows;
+}
+
+function renderNavMappingPage(){
+  const rows = collectMenuRows();
+
+  // group by menu label for separate tables, preserving encounter order
+  const groups = [];
+  rows.forEach(r=>{
+    if(r.__banner){
+      groups.push({banner:r.__banner});
+      return;
+    }
+    let g = groups.find(g=>g.menu===r.menu && !g.banner);
+    if(!g){ g = {menu:r.menu, rows:[]}; groups.push(g); }
+    g.rows.push(r);
+  });
+
+  let tablesHTML = '';
+  let pendingBanner = '';
+  groups.forEach(g=>{
+    if(g.banner){ pendingBanner = `<div class="map-note">${g.banner}</div>`; return; }
+    tablesHTML += pendingBanner;
+    pendingBanner = '';
+    tablesHTML += `
+      <table class="nav-table">
+        <caption>${g.menu}</caption>
+        <thead><tr><th>選單位置</th><th>選單文字</th><th>目的地 URL</th><th>備註</th></tr></thead>
+        <tbody>
+          ${g.rows.map(r=>`
+            <tr>
+              <td>${r.column}</td>
+              <td>${r.text}</td>
+              <td class="url">${r.url}</td>
+              <td><span class="tag tag-${r.tag}">${r.tag}</span>${r.note ? ' '+r.note : ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  });
+
+  // reachable set (real sitemap URLs only)
+  const reachable = new Set();
+  rows.forEach(r=>{ if(r.url && SITEMAP_URLS.includes(r.url)) reachable.add(r.url); });
+  const unreachable = SITEMAP_URLS.filter(u => u !== '/' && !reachable.has(u));
+
+  app.innerHTML = `
+    <div class="map-wrap">
+      <a class="back-link" href="#/">← 回首頁</a>
+      <h1>選單對照表 Nav Mapping</h1>
+      <p class="doc-sub">每一列對應「選單」線框稿中的一個連結，標註其在 sitemap 中的真實位置與差異類型。標籤說明：
+        <span class="tag tag-直連">直連</span> 選單文字與頁面一致 ／
+        <span class="tag tag-改名">改名</span> 選單文字與頁面標題不同 ／
+        <span class="tag tag-提升至頂層">提升至頂層</span> sitemap 中位置較深，選單刻意提升 ／
+        <span class="tag tag-待確認">待確認</span> sitemap 無對應頁面，暫連結至猜測網址。
+      </p>
+      ${tablesHTML}
+      <div class="unreachable-box">
+        <h2>sitemap 中未被任何選單連結到的頁面</h2>
+        <p class="hint">這是預期狀況——這些頁面預期透過頁尾或內文中的情境連結（contextual link）觸及，不一定要出現在主選單中。</p>
+        <ul>
+          ${unreachable.map(u=>`<li><a href="#${u}">${PAGES[u] ? PAGES[u].label : u}</a> <code>${u}</code></li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+/* =====================================================================
+   ROUTER
+===================================================================== */
+
+function route(){
+  let hash = location.hash.replace(/^#/, '');
+  if(!hash) hash = '/';
+  closePanel();
+  mobileNavEl.hidden = true;
+  window.scrollTo(0,0);
+  updateActiveNav(hash);
+
+  if(hash === '/sitemap') return renderSitemapPage();
+  if(hash === '/nav-mapping') return renderNavMappingPage();
+  return renderHero(hash);
+}
+
+buildTopNav();
+buildMobileNav();
+wireNavInteractions();
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+route();
+</script>
+</body>
+</html>
