@@ -466,7 +466,7 @@ const PAGES = {
     crumbs:[c('/','首頁'), cur('精選教材'), cur('免費資源')]},
   '/resources/kids': {label:'免費課程/免費試上', heroTitle:'免費資源/兒童免費課程,免費試上',
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程/免費試上')]},
-  '/resources/adults': {label:'免費課程', heroTitle:'免費資源/免費課程',
+  '/resources/adults': {label:'免費課程', heroTitle:'免費資源/成人免費課程',
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程')]},
 
   '/blog': {label:'所有部落格文章', heroTitle:'所有部落格文章', crumbs:[c('/','首頁'), cur('所有部落格文章')]},
@@ -501,6 +501,10 @@ const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
 // 'grouped' = section heading + "所有文章" link (to real sitemap URL) + placeholder image grid.
 // 'cards'   = large clickable overview cards, each linking straight to a real sitemap URL.
 const LISTING_SECTIONS = {
+  '/news': {type:'grouped', groups:[
+    {title:'媒體報導', url:'/blog/media', count:4},
+    {title:'活動紀錄', url:'/blog/events', count:4},
+  ]},
   '/blog': {type:'grouped', groups:[
     {title:'公告',     url:'/blog/latest', count:4},
     {title:'活動紀錄',  url:'/blog/events', count:4},
