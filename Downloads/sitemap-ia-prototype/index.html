@@ -150,6 +150,30 @@
   .listing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
   .listing-card{aspect-ratio:0.86;background:var(--header-gray);}
 
+  /* ---------- Blog layout: sidebar filter + content (all /blog pages) ---------- */
+  .blog-layout{max-width:var(--content-max);margin:0 auto;padding:56px 48px 100px;display:flex;gap:40px;align-items:flex-start;}
+  .filter-sidebar{width:280px;flex-shrink:0;}
+  .filter-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .filter-card-head{
+    width:100%;background:#dde6dc;color:#3f5f47;font-size:17px;font-weight:700;
+    padding:22px 26px;display:flex;align-items:center;justify-content:space-between;
+    text-align:left;
+  }
+  .filter-chev{font-size:18px;line-height:1;}
+  .filter-card-body{padding:22px 26px;display:flex;flex-direction:column;gap:20px;}
+  .filter-card.collapsed .filter-card-body{display:none;}
+  .filter-option{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:#6b9b7f;cursor:pointer;}
+  .filter-option input{width:16px;height:16px;accent-color:#6b9b7f;}
+  .blog-content{flex:1;min-width:0;display:flex;flex-direction:column;gap:56px;}
+  .blog-content .listing-group{margin-bottom:0;}
+  .blog-content .listing-grid{grid-template-columns:repeat(3,1fr);}
+
+  @media (max-width:1024px){
+    .blog-layout{flex-direction:column;padding:40px 20px 80px;}
+    .filter-sidebar{width:100%;}
+    .blog-content .listing-grid{grid-template-columns:repeat(2,1fr);}
+  }
+
   /* ---------- Overview cards (/resources, /locations) ---------- */
   .overview-wrap{max-width:var(--content-max);margin:0 auto;padding:100px 48px;display:flex;gap:40px;flex-wrap:wrap;justify-content:center;}
   .overview-card{
@@ -297,7 +321,7 @@ const ICONS = {
 // Top-level nav bar, left to right per screenshots
 const TOP_NAV = [
   {type:'menu', key:'about',     label:'認識我們'},
-  {type:'link', label:'最新消息', url:'/news'},
+  {type:'menu', key:'news',      label:'最新消息'},
   {type:'menu', key:'kids',      label:'兒童課程'},
   {type:'menu', key:'adults',    label:'成人課程'},
   {type:'menu', key:'materials', label:'精選教材'},
@@ -306,6 +330,24 @@ const TOP_NAV = [
 
 // Mega menu contents. Every item may carry {tag, note} used to auto-build the nav-mapping table.
 const MENU_DATA = {
+  news: {
+    label:'最新消息',
+    wireframeMissing:true,
+    intent:{
+      heading:'想更了解我們？',
+      items:[
+        {icon:'gift', text:'認識創辦人', url:'/founder', tag:'直連'},
+        {icon:'pin',  text:'原創教材', url:'/shop', tag:'改名', note:'選單「原創教材」／頁面標題「SoR 原創教材商店」'},
+      ]
+    },
+    columns:[
+      {heading:'最新消息', items:[
+        {text:'媒體公告', url:'/blog/media', tag:'改名', note:'選單「媒體公告」／頁面標題「媒體報導（別人寫我們）」'},
+        {text:'活動資訊', url:'/blog/events-info', tag:'直連'},
+        {text:'活動紀錄', url:'/blog/events', tag:'直連'},
+      ]},
+    ]
+  },
   about: {
     label:'認識我們',
     intent:{
@@ -344,8 +386,9 @@ const MENU_DATA = {
         {text:'桃園旗艦殿', url:'/locations/taoyuan', tag:'直連'},
         {text:'高雄旗艦殿', url:'/locations/kaohsiung', tag:'直連'},
       ]},
-      {heading:'認證', items:[
-        {text:'教學成果', url:'/kids/outcome', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      {heading:'教學成果', items:[
+        {text:'學員見證', url:'/kids/outcome', tag:'改名', note:'選單「學員見證」／頁面標題「教學成果」'},
+        {text:'高光時刻', url:'/kids/highlights', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址'},
       ]},
     ]
   },
@@ -368,8 +411,9 @@ const MENU_DATA = {
       {heading:'就業培訓', items:[
         {text:'師資培訓（正音師之路）', url:'/adults/teacher-training', tag:'直連'},
       ]},
-      {heading:'認證', items:[
-        {text:'教學成果', url:'/adults/outcome', tag:'直連', note:'sitemap 未提供頁面標題，依選單文字採用'},
+      {heading:'教學成果', items:[
+        {text:'學員見證', url:'/adults/outcome', tag:'改名', note:'選單「學員見證」／頁面標題「教學成果」'},
+        {text:'高光時刻', url:'/adults/highlights', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址'},
       ]},
     ]
   },
@@ -394,7 +438,6 @@ const MENU_DATA = {
 };
 
 const DIRECT_LINKS = [
-  {menu:'最新消息 (頂層)', text:'最新消息', url:'/news', tag:'直連', note:'頁面內容來源為 blog 貼文（sitemap 標註 [fetch from blog post]）'},
   {menu:'部落格 (頂層)', text:'部落格', url:'/blog', tag:'直連'},
 ];
 
@@ -416,8 +459,10 @@ const PAGES = {
   '/news': {label:'最新消息', heroTitle:'最新消息', crumbs:[c('/','首頁'), cur('最新消息')]},
   '/blog/events': {label:'活動紀錄', heroTitle:'活動紀錄',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('活動紀錄')]},
-  '/blog/media': {label:'媒體報導', heroTitle:'媒體報導',
+  '/blog/media': {label:'媒體報導', heroTitle:'媒體報導（別人寫我們）',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('媒體報導')]},
+  '/blog/events-info': {label:'活動資訊', heroTitle:'活動資訊',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('活動資訊')]},
 
   '/kids': {label:'所有兒童課程', heroTitle:'所有兒童課程', crumbs:[c('/','首頁'), cur('所有兒童課程')]},
   '/kids/phonics': {label:'SoR 拼讀小達人', heroTitle:'兒童課程/SoR 拼讀小達人',
@@ -426,7 +471,7 @@ const PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 單字小達人')]},
   '/kids/reading': {label:'SoR 閱讀小達人', heroTitle:'兒童課程/SoR 閱讀小達人',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 閱讀小達人')]},
-  '/kids/outcome': {label:'教學成果', heroTitle:'兒童課程/教學成果',
+  '/kids/outcome': {label:'教學成果', heroTitle:'學員見證',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教學成果')]},
   '/kids/faq': {label:'常見問題', heroTitle:'兒童課程/常見問題',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('常見問題')]},
@@ -466,7 +511,7 @@ const PAGES = {
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程')]},
 
   '/blog': {label:'所有部落格文章', heroTitle:'所有部落格文章', crumbs:[c('/','首頁'), cur('所有部落格文章')]},
-  '/blog/latest': {label:'公告', heroTitle:'公告',
+  '/blog/latest': {label:'公告', heroTitle:'公告（我們自己寫的內容）',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('公告')]},
   '/blog/article': {label:'冷流量文章', heroTitle:'冷流量文章',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('冷流量文章')]},
@@ -489,6 +534,10 @@ const EXTRA_PAGES = {
   '/resources/self-study': {label:'4-5歲自學方案', heroTitle:'4-5歲自學方案', guessed:true,
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('4-5歲自學方案')]},
   '/cart': {label:'購物車', heroTitle:'購物車', crumbs:[c('/','首頁'), cur('購物車')]},
+  '/kids/highlights': {label:'高光時刻', heroTitle:'高光時刻', guessed:true,
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('高光時刻')]},
+  '/adults/highlights': {label:'高光時刻', heroTitle:'成人課程/高光時刻', guessed:true,
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('高光時刻')]},
 };
 
 const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
@@ -501,6 +550,8 @@ const LISTING_SECTIONS = {
     {title:'媒體報導', url:'/blog/media', count:4},
     {title:'活動紀錄', url:'/blog/events', count:4},
   ]},
+  '/kids/highlights': {type:'gallery', heading:'高光時刻', count:8},
+  '/adults/highlights': {type:'gallery', heading:'高光時刻', count:8},
   '/blog': {type:'grouped', groups:[
     {title:'公告',     url:'/blog/latest', count:4},
     {title:'活動紀錄',  url:'/blog/events', count:4},
@@ -533,6 +584,55 @@ const LISTING_SECTIONS = {
   }},
 };
 
+// Every /blog page gets a sidebar filter (受眾: 兒童 / 成人) beside its content.
+const BLOG_URLS = ['/blog', '/blog/latest', '/blog/article', '/blog/events', '/blog/media', '/blog/events-info'];
+
+function renderFilterSidebar(){
+  return `
+    <aside class="filter-sidebar">
+      <div class="filter-card">
+        <button class="filter-card-head" type="button" data-filter-toggle>
+          <span>受眾篩選</span>
+          <span class="filter-chev">－</span>
+        </button>
+        <div class="filter-card-body">
+          <label class="filter-option"><input type="checkbox" value="kids"> 兒童</label>
+          <label class="filter-option"><input type="checkbox" value="adults"> 成人</label>
+        </div>
+      </div>
+    </aside>
+  `;
+}
+
+function renderBlogListingContent(url){
+  const cfg = LISTING_SECTIONS[url];
+  if(cfg && cfg.type === 'grouped'){
+    return cfg.groups.map(g=>`
+      <section class="listing-group">
+        <div class="listing-group-head">
+          <h2>${g.title}</h2>
+          <a class="listing-all-link" href="#${g.url}">所有文章 ›</a>
+        </div>
+        <div class="listing-grid">
+          ${Array.from({length:g.count}).map(()=>'<div class="listing-card"></div>').join('')}
+        </div>
+      </section>
+    `).join('');
+  }
+  return `<section class="listing-group">
+    <div class="listing-grid">
+      ${Array.from({length:9}).map(()=>'<div class="listing-card"></div>').join('')}
+    </div>
+  </section>`;
+}
+
+function renderBlogLayout(url){
+  return `<div class="blog-layout">
+    ${renderFilterSidebar()}
+    <div class="blog-content">${renderBlogListingContent(url)}</div>
+  </div>`;
+}
+
 function renderListingExtra(url){
   const cfg = LISTING_SECTIONS[url];
   if(!cfg) return '';
@@ -548,6 +648,16 @@ function renderListingExtra(url){
         </div>
       </section>
     `).join('')}</div>`;
+  }
+  if(cfg.type === 'gallery'){
+    return `<div class="listing-wrap">
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.heading}</h2></div>
+        <div class="listing-grid">
+          ${Array.from({length:cfg.count}).map(()=>'<div class="listing-card"></div>').join('')}
+        </div>
+      </section>
+    </div>`;
   }
   if(cfg.type === 'cards'){
     return `<div class="overview-wrap">
@@ -614,6 +724,7 @@ const SITE_TREE = [
       {u:'/blog/latest', l:'公告'},
       {u:'/blog/article', l:'冷流量文章'},
       {u:'/blog/events', l:'活動紀錄', dup:true},
+      {u:'/blog/events-info', l:'活動資訊'},
     ]},
     {u:'/shop', l:'SoR 原創教材商店'},
     {u:'/mi-pen', l:'點讀專區'},
@@ -750,7 +861,7 @@ navToggleBtn.addEventListener('click', ()=>{ mobileNavEl.hidden = !mobileNavEl.h
 function updateActiveNav(url){
   const map = [
     {key:'about', test:u=>['/about-sor','/certification','/founder'].includes(u)},
-    {url:'/news', test:u=>u==='/news'},
+    {key:'news', test:u=>u==='/news'},
     {key:'kids', test:u=>u.startsWith('/kids')||u.startsWith('/locations')},
     {key:'adults', test:u=>u.startsWith('/adults')},
     {key:'materials', test:u=>['/shop','/mi-pen','/support/errata','/resources'].some(p=>u.startsWith(p))},
@@ -768,6 +879,14 @@ function updateActiveNav(url){
 ===================================================================== */
 
 const app = document.getElementById('app');
+
+app.addEventListener('click', (e)=>{
+  const toggleBtn = e.target.closest('[data-filter-toggle]');
+  if(!toggleBtn) return;
+  const card = toggleBtn.closest('.filter-card');
+  card.classList.toggle('collapsed');
+  toggleBtn.querySelector('.filter-chev').textContent = card.classList.contains('collapsed') ? '＋' : '－';
+});
 
 function renderBreadcrumb(crumbs){
   return crumbs.map((cr,i)=>{
@@ -787,7 +906,7 @@ function renderHero(url){
   }
   const guessedHTML = page.guessed ? `<div class="guessed-badge">⚠ 猜測頁面・sitemap 無對應（待確認）</div>` : '';
   const noteHTML = page.note ? `<div class="children-line">${page.note}</div>` : '';
-  const extraHTML = renderListingExtra(url);
+  const extraHTML = BLOG_URLS.includes(url) ? renderBlogLayout(url) : renderListingExtra(url);
 
   app.innerHTML = `
     <section class="hero">
