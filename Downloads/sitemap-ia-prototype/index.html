@@ -516,7 +516,7 @@ const PAGES = {
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('免費課程')]},
 
   '/blog': {label:'所有部落格文章', heroTitle:'所有部落格文章', crumbs:[c('/','首頁'), cur('所有部落格文章')]},
-  '/blog/latest': {label:'公告', heroTitle:'公告（我們自己寫的內容）',
+  '/blog/latest': {label:'公告', heroTitle:'公告（我們自己寫的）',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('公告')]},
   '/blog/article': {label:'冷流量文章', heroTitle:'冷流量文章',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('冷流量文章')]},
@@ -552,13 +552,14 @@ const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
 // 'cards'   = large clickable overview cards, each linking straight to a real sitemap URL.
 const LISTING_SECTIONS = {
   '/news': {type:'grouped', groups:[
-    {title:'媒體報導', url:'/blog/media', count:4},
+    {title:'媒體報導（別人寫我們）', url:'/blog/media', count:4},
     {title:'活動紀錄', url:'/blog/events', count:4},
   ]},
   '/kids/highlights': {type:'gallery', heading:'高光時刻', count:8},
   '/adults/highlights': {type:'gallery', heading:'高光時刻', count:8},
   '/blog': {type:'grouped', groups:[
-    {title:'公告',     url:'/blog/latest', count:4},
+    {title:'公告（我們自己寫的）', url:'/blog/latest', count:4},
+    {title:'媒體報導（別人寫我們）', url:'/blog/media', count:4},
     {title:'活動紀錄',  url:'/blog/events', count:4},
     {title:'冷流量文章', url:'/blog/article', count:4},
   ]},
@@ -592,7 +593,25 @@ const LISTING_SECTIONS = {
 // Every /blog page gets a sidebar filter (受眾: 兒童 / 成人) beside its content.
 const BLOG_URLS = ['/blog', '/blog/latest', '/blog/article', '/blog/events', '/blog/media', '/blog/events-info'];
 
-function renderFilterSidebar(){
+function renderFilterSidebar(url){
+  const categoryGroupHTML = url === '/blog' ? `
+        <div class="filter-group">
+          <h4 class="filter-group-title">分類</h4>
+          <div class="filter-list">
+            <div class="filter-row" data-filter-row>
+              <label class="filter-option"><input type="checkbox" value="latest"> 公告（我們自己寫的）</label>
+            </div>
+            <div class="filter-row" data-filter-row>
+              <label class="filter-option"><input type="checkbox" value="media"> 媒體報導（別人寫我們）</label>
+            </div>
+            <div class="filter-row" data-filter-row>
+              <label class="filter-option"><input type="checkbox" value="events-info"> 活動資訊</label>
+            </div>
+            <div class="filter-row" data-filter-row>
+              <label class="filter-option"><input type="checkbox" value="events"> 活動紀錄</label>
+            </div>
+          </div>
+        </div>` : '';
   return `
     <aside class="filter-sidebar">
       <div class="filter-card">
@@ -607,24 +626,7 @@ function renderFilterSidebar(){
               <label class="filter-option"><input type="checkbox" value="adults"> 成人</label>
             </div>
           </div>
-        </div>
-        <div class="filter-group">
-          <h4 class="filter-group-title">分類</h4>
-          <div class="filter-list">
-            <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="latest"> 公告</label>
-            </div>
-            <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="media"> 媒體報導</label>
-            </div>
-            <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="events-info"> 活動資訊</label>
-            </div>
-            <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="events"> 活動紀錄</label>
-            </div>
-          </div>
-        </div>
+        </div>${categoryGroupHTML}
         <div class="filter-footer">
           <button type="button" class="filter-reset" data-filter-reset>重置篩選</button>
         </div>
@@ -657,7 +659,7 @@ function renderBlogListingContent(url){
 
 function renderBlogLayout(url){
   return `<div class="blog-layout">
-    ${renderFilterSidebar()}
+    ${renderFilterSidebar(url)}
     <div class="blog-content">${renderBlogListingContent(url)}</div>
   </div>`;
 }
