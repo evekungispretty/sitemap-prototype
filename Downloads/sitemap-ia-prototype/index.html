@@ -167,6 +167,16 @@
   .filter-row.checked::before{background:var(--text);}
   .filter-option{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;}
   .filter-option input{width:17px;height:17px;accent-color:var(--text);}
+  .filter-row-parent{justify-content:space-between;}
+  .filter-expand-toggle{
+    font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;
+    padding:4px 6px;line-height:1;
+  }
+  .filter-expand-toggle:hover{color:var(--text);}
+  .filter-sublist{display:flex;flex-direction:column;}
+  .filter-sublist[hidden]{display:none;}
+  .filter-row-sub{padding-left:38px;}
+  .filter-row-sub .filter-option{font-size:14px;font-weight:500;color:var(--muted);}
   .filter-footer{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
   .filter-reset{
     width:100%;padding:10px 14px;border:1px solid var(--border-2);border-radius:10px;
@@ -326,18 +336,17 @@ const ICONS = {
 // Top-level nav bar, left to right per screenshots
 const TOP_NAV = [
   {type:'menu', key:'about',     label:'認識我們'},
-  {type:'menu', key:'news',      label:'最新消息'},
-  {type:'menu', key:'kids',      label:'兒童課程'},
-  {type:'menu', key:'adults',    label:'成人課程'},
+  {type:'menu', key:'news',      label:'最新消息',   landingUrl:'/news'},
+  {type:'menu', key:'kids',      label:'兒童課程',   landingUrl:'/kids'},
+  {type:'menu', key:'adults',    label:'成人課程',   landingUrl:'/adults'},
   {type:'menu', key:'materials', label:'精選教材'},
-  {type:'link', label:'部落格',   url:'/blog'},
+  {type:'menu', key:'blog',      label:'部落格',     landingUrl:'/blog'},
 ];
 
 // Mega menu contents. Every item may carry {tag, note} used to auto-build the nav-mapping table.
 const MENU_DATA = {
   news: {
     label:'最新消息',
-    wireframeMissing:true,
     intent:{
       heading:'想更了解我們？',
       items:[
@@ -347,9 +356,8 @@ const MENU_DATA = {
     },
     columns:[
       {heading:'最新消息', items:[
-        {text:'媒體報導', url:'/blog/media', tag:'改名', note:'選單「媒體報導」／頁面標題「媒體報導（別人寫我們）」'},
-        {text:'活動資訊', url:'/blog/events-info', tag:'直連'},
-        {text:'活動紀錄', url:'/blog/events', tag:'直連'},
+        {text:'最新活動（招生說明會）', url:'/news/events', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址，待確認'},
+        {text:'熱門課程（近期主推課程、即將開課、體驗課）', url:'/news/courses', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址，待確認'},
       ]},
     ]
   },
@@ -392,7 +400,7 @@ const MENU_DATA = {
         {text:'高雄旗艦殿', url:'/locations/kaohsiung', tag:'直連'},
       ]},
       {heading:'教學成果', items:[
-        {text:'學員見證', url:'/kids/outcome', tag:'改名', note:'選單「學員見證」／頁面標題「教學成果」'},
+        {text:'學員見證', url:'/blog/testimonials/kids', tag:'直連'},
         {text:'高光時刻', url:'/kids/highlights', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址'},
       ]},
     ]
@@ -417,7 +425,7 @@ const MENU_DATA = {
         {text:'師資培訓（正音師之路）', url:'/adults/teacher-training', tag:'直連'},
       ]},
       {heading:'教學成果', items:[
-        {text:'學員見證', url:'/adults/outcome', tag:'改名', note:'選單「學員見證」／頁面標題「教學成果」'},
+        {text:'學員見證', url:'/blog/testimonials/adults', tag:'直連'},
         {text:'高光時刻', url:'/adults/highlights', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址'},
       ]},
     ]
@@ -440,11 +448,32 @@ const MENU_DATA = {
       ]},
     ]
   },
+  blog: {
+    label:'部落格',
+    intent:{
+      heading:'還不認識 SoR？從這裡開始',
+      items:[
+        {icon:'gift', text:'所有兒童課程', url:'/kids', tag:'直連'},
+        {icon:'pin',  text:'部落格', url:'/blog', tag:'直連'},
+      ]
+    },
+    columns:[
+      {heading:'部落格', items:[
+        {text:'公告', url:'/blog/latest', tag:'改名', note:'選單「公告」／頁面標題「公告（我們自己寫的）」'},
+        {text:'媒體報導', url:'/blog/media', tag:'改名', note:'選單「媒體報導」／頁面標題「媒體報導（別人寫我們）」'},
+        {text:'活動紀錄', url:'/blog/events', tag:'直連'},
+        {text:'學員見證', url:'/blog/testimonials/kids', tag:'直連', note:'兒童與成人學員見證分為兩頁，此處連結至兒童版；成人版見成人課程選單'},
+      ]},
+      {heading:'精選文章（冷流量）', items:[
+        {text:'學習方法', url:'/blog/article/method', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址，待確認'},
+        {text:'考試升學', url:'/blog/article/exam', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址，待確認'},
+        {text:'職場英語', url:'/blog/article/work', tag:'待確認', note:'sitemap 無對應頁面，暫連結至猜測網址，待確認'},
+      ]},
+    ]
+  },
 };
 
-const DIRECT_LINKS = [
-  {menu:'部落格 (頂層)', text:'部落格', url:'/blog', tag:'直連'},
-];
+const DIRECT_LINKS = [];
 
 // crumb helpers
 const c  = (u,l)=>({u,l});
@@ -462,12 +491,24 @@ const PAGES = {
     crumbs:[c('/','首頁'), cur('認識我們'), cur('創辦人介紹:蕭文乾博士')]},
 
   '/news': {label:'最新消息', heroTitle:'最新消息', crumbs:[c('/','首頁'), cur('最新消息')]},
+  '/news/events': {label:'最新活動（招生說明會）', heroTitle:'最新活動（招生說明會）',
+    crumbs:[c('/','首頁'), c('/news','最新消息'), cur('最新活動（招生說明會）')]},
+  '/news/courses': {label:'熱門課程（近期主推課程、即將開課、體驗課）', heroTitle:'熱門課程（近期主推課程、即將開課、體驗課）',
+    crumbs:[c('/','首頁'), c('/news','最新消息'), cur('熱門課程（近期主推課程、即將開課、體驗課）')]},
   '/blog/events': {label:'活動紀錄', heroTitle:'活動紀錄',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('活動紀錄')]},
   '/blog/media': {label:'媒體報導', heroTitle:'媒體報導（別人寫我們）',
     crumbs:[c('/','首頁'), c('/blog','部落格'), cur('媒體報導')]},
-  '/blog/events-info': {label:'活動資訊', heroTitle:'活動資訊',
-    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('活動資訊')]},
+  '/blog/testimonials/kids': {label:'學員見證（兒童）', heroTitle:'學員見證',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('學員見證')]},
+  '/blog/testimonials/adults': {label:'學員見證（成人）', heroTitle:'學員見證',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('學員見證')]},
+  '/blog/article/method': {label:'學習方法', heroTitle:'學習方法',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('學習方法')]},
+  '/blog/article/exam': {label:'考試升學', heroTitle:'考試升學',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('考試升學')]},
+  '/blog/article/work': {label:'職場英語', heroTitle:'職場英語',
+    crumbs:[c('/','首頁'), c('/blog','部落格'), cur('職場英語')]},
 
   '/kids': {label:'所有兒童課程', heroTitle:'所有兒童課程', crumbs:[c('/','首頁'), cur('所有兒童課程')]},
   '/kids/phonics': {label:'SoR 拼讀小達人', heroTitle:'SoR 拼讀小達人',
@@ -476,8 +517,6 @@ const PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 單字小達人')]},
   '/kids/reading': {label:'SoR 閱讀小達人', heroTitle:'SoR 閱讀小達人',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('SoR 閱讀小達人')]},
-  '/kids/outcome': {label:'教學成果', heroTitle:'學員見證',
-    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教學成果')]},
   '/kids/faq': {label:'常見問題', heroTitle:'常見問題',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('常見問題')]},
 
@@ -503,8 +542,6 @@ const PAGES = {
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('師資培訓(正音師之路)')]},
   '/adults/online': {label:'成人線上課程', heroTitle:'成人線上課程',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('成人線上課程')]},
-  '/adults/outcome': {label:'教學成果', heroTitle:'教學成果',
-    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('教學成果')]},
   '/adults/faq': {label:'常見問題', heroTitle:'常見問題',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('常見問題')]},
 
@@ -552,8 +589,8 @@ const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
 // 'cards'   = large clickable overview cards, each linking straight to a real sitemap URL.
 const LISTING_SECTIONS = {
   '/news': {type:'grouped', groups:[
-    {title:'媒體報導（別人寫我們）', url:'/blog/media', count:4},
-    {title:'活動紀錄', url:'/blog/events', count:4},
+    {title:'最新活動（招生說明會）', url:'/news/events', count:4},
+    {title:'熱門課程（近期主推課程、即將開課、體驗課）', url:'/news/courses', count:4},
   ]},
   '/kids/highlights': {type:'gallery', heading:'高光時刻', count:8},
   '/adults/highlights': {type:'gallery', heading:'高光時刻', count:8},
@@ -591,7 +628,7 @@ const LISTING_SECTIONS = {
 };
 
 // Every /blog page gets a sidebar filter (受眾: 兒童 / 成人) beside its content.
-const BLOG_URLS = ['/blog', '/blog/latest', '/blog/article', '/blog/events', '/blog/media', '/blog/events-info'];
+const BLOG_URLS = ['/blog', '/blog/latest', '/blog/article', '/blog/events', '/blog/media'];
 
 function renderFilterSidebar(url){
   const categoryGroupHTML = url === '/blog' ? `
@@ -599,16 +636,31 @@ function renderFilterSidebar(url){
           <h4 class="filter-group-title">分類</h4>
           <div class="filter-list">
             <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="latest"> 公告（我們自己寫的）</label>
+              <label class="filter-option"><input type="checkbox" value="latest"> 公告</label>
             </div>
             <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="media"> 媒體報導（別人寫我們）</label>
+              <label class="filter-option"><input type="checkbox" value="media"> 媒體報導</label>
             </div>
             <div class="filter-row" data-filter-row>
-              <label class="filter-option"><input type="checkbox" value="events-info"> 活動資訊</label>
+              <label class="filter-option"><input type="checkbox" value="testimonials"> 學員見證</label>
             </div>
             <div class="filter-row" data-filter-row>
               <label class="filter-option"><input type="checkbox" value="events"> 活動紀錄</label>
+            </div>
+            <div class="filter-row filter-row-parent" data-filter-row>
+              <label class="filter-option"><input type="checkbox" value="article"> 精選文章（冷流量）</label>
+              <button type="button" class="filter-expand-toggle" data-filter-expand-toggle aria-expanded="true" aria-label="展開/收合 精選文章（冷流量）子分類">︿</button>
+            </div>
+            <div class="filter-sublist" data-filter-sublist>
+              <div class="filter-row filter-row-sub" data-filter-row>
+                <label class="filter-option"><input type="checkbox" value="article-method"> 學習方法</label>
+              </div>
+              <div class="filter-row filter-row-sub" data-filter-row>
+                <label class="filter-option"><input type="checkbox" value="article-exam"> 考試升學</label>
+              </div>
+              <div class="filter-row filter-row-sub" data-filter-row>
+                <label class="filter-option"><input type="checkbox" value="article-work"> 職場英語</label>
+              </div>
             </div>
           </div>
         </div>` : '';
@@ -733,7 +785,6 @@ const SITE_TREE = [
         {u:'/locations/taoyuan', l:'桃園旗艦殿'},
         {u:'/locations/kaohsiung', l:'高雄旗艦殿'},
       ]},
-      {u:'/kids/outcome', l:'教學成果'},
       {u:'/kids/highlights', l:'高光時刻'},
       {u:'/kids/faq', l:'常見問題'},
     ]},
@@ -744,7 +795,6 @@ const SITE_TREE = [
       {u:'/adults/adult-pronunciation', l:'發音聽力矯正班'},
       {u:'/adults/teacher-training', l:'師資培訓(正音師之路)'},
       {u:'/adults/online', l:'成人線上課程'},
-      {u:'/adults/outcome', l:'成人教學成果'},
       {u:'/adults/highlights', l:'高光時刻'},
       {u:'/adults/faq', l:'常見問題'},
     ]},
@@ -756,8 +806,9 @@ const SITE_TREE = [
       {u:'/blog/latest', l:'公告'},
       {u:'/blog/article', l:'冷流量文章'},
       {u:'/blog/events', l:'活動紀錄', dup:true},
-      {u:'/blog/events-info', l:'活動資訊'},
       {u:'/blog/media', l:'媒體報導'},
+      {u:'/blog/testimonials/kids', l:'學員見證（兒童）', note:'原兒童課程學員見證，搬遷自 /kids/outcome'},
+      {u:'/blog/testimonials/adults', l:'學員見證（成人）', note:'原成人課程學員見證，搬遷自 /adults/outcome'},
     ]},
     {u:'/shop', l:'SoR 原創教材商店'},
     {u:'/mi-pen', l:'點讀專區'},
@@ -782,12 +833,11 @@ const siteHeaderEl = document.getElementById('siteHeader');
 function buildTopNav(){
   navListEl.innerHTML = TOP_NAV.map(item=>{
     if(item.type==='menu'){
-      return `<li class="nav-li" data-key="${item.key}">
-        <button class="nav-item" data-menu-key="${item.key}" aria-haspopup="true" aria-expanded="false">
-          ${item.label}
-          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-      </li>`;
+      const chev = `<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>`;
+      const trigger = item.landingUrl
+        ? `<a class="nav-item" data-menu-key="${item.key}" href="#${item.landingUrl}" aria-haspopup="true" aria-expanded="false">${item.label}${chev}</a>`
+        : `<button class="nav-item" data-menu-key="${item.key}" aria-haspopup="true" aria-expanded="false">${item.label}${chev}</button>`;
+      return `<li class="nav-li" data-key="${item.key}">${trigger}</li>`;
     }
     return `<li class="nav-li" data-url="${item.url}">
       <a class="nav-item" href="#${item.url}">${item.label}</a>
@@ -883,8 +933,11 @@ function buildMobileNav(){
       subs = subs.concat(col.items.map(i=>({text:`${col.heading} — ${i.text}`,url:i.url})));
       if(col.pill) subs.push({text:col.pill.text,url:col.pill.url});
     });
+    const topHTML = item.landingUrl
+      ? `<a class="m-top" href="#${item.landingUrl}">${item.label}</a>`
+      : `<span class="m-top">${item.label}</span>`;
     return `<div class="m-section">
-      <span class="m-top">${item.label}</span>
+      ${topHTML}
       ${subs.map(s=>`<a class="m-sub" href="#${s.url}">${s.text}</a>`).join('')}
     </div>`;
   }).join('');
@@ -898,7 +951,7 @@ function updateActiveNav(url){
     {key:'kids', test:u=>u.startsWith('/kids')||u.startsWith('/locations')},
     {key:'adults', test:u=>u.startsWith('/adults')},
     {key:'materials', test:u=>['/shop','/mi-pen','/support/errata','/resources'].some(p=>u.startsWith(p))},
-    {url:'/blog', test:u=>u.startsWith('/blog')},
+    {key:'blog', test:u=>u.startsWith('/blog')},
   ];
   const hit = map.find(m=>m.test(url));
   document.querySelectorAll('.nav-li').forEach(li=>{
@@ -914,12 +967,27 @@ function updateActiveNav(url){
 const app = document.getElementById('app');
 
 app.addEventListener('click', (e)=>{
+  const expandBtn = e.target.closest('[data-filter-expand-toggle]');
+  if(expandBtn){
+    const sublist = expandBtn.closest('.filter-row-parent').nextElementSibling;
+    const expanded = expandBtn.getAttribute('aria-expanded') === 'true';
+    expandBtn.setAttribute('aria-expanded', String(!expanded));
+    expandBtn.textContent = expanded ? '▾' : '︿';
+    if(sublist) sublist.hidden = expanded;
+    return;
+  }
   const resetBtn = e.target.closest('[data-filter-reset]');
   if(!resetBtn) return;
   const card = resetBtn.closest('.filter-card');
   card.querySelectorAll('[data-filter-row]').forEach(row=>{
     row.querySelector('input[type="checkbox"]').checked = false;
     row.classList.remove('checked');
+  });
+  card.querySelectorAll('[data-filter-expand-toggle]').forEach(btn=>{
+    btn.setAttribute('aria-expanded', 'true');
+    btn.textContent = '︿';
+    const sublist = btn.closest('.filter-row-parent').nextElementSibling;
+    if(sublist) sublist.hidden = false;
   });
 });
 
