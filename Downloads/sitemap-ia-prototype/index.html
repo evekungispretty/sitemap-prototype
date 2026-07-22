@@ -231,6 +231,40 @@
     .feature-split{flex-direction:column;}
   }
 
+  /* ---------- Course & location detail wireframes (/kids/phonics, /locations/taipei) ---------- */
+  .detail-media{width:100%;aspect-ratio:2.6;background:var(--header-gray);}
+  .signup-row{display:flex;gap:24px;max-width:900px;margin:0 auto;}
+  .overview-card--end{cursor:default;}
+  .overview-card--end:hover{background:var(--header-gray);}
+
+  .gallery-row{display:flex;gap:24px;}
+  .gallery-card{flex:1;aspect-ratio:1;background:var(--header-gray);}
+
+  .course-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;}
+  .course-detail-card{
+    aspect-ratio:1.7;background:var(--header-gray);
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    padding:24px 16px;text-align:center;
+  }
+  .course-detail-title{font-size:18px;color:var(--text);}
+  .course-detail-actions{display:flex;gap:12px;}
+  .course-detail-btn{
+    background:var(--dark-2);color:#fff;font-size:13px;font-weight:600;
+    padding:10px 22px;border-radius:22px;white-space:nowrap;
+  }
+  a.course-detail-btn:hover{background:#000;}
+  .course-detail-btn--end{cursor:default;}
+
+  .cta-band{background:var(--header-gray);padding:56px 24px;display:flex;justify-content:center;margin-top:56px;}
+  .cta-btn{background:var(--dark-2);color:#fff;font-size:14px;font-weight:600;padding:12px 30px;border-radius:24px;}
+  .cta-btn:hover{background:#000;}
+
+  @media (max-width:1024px){
+    .course-detail-grid{grid-template-columns:1fr;}
+    .signup-row{flex-direction:column;}
+    .gallery-row{flex-direction:column;}
+  }
+
   /* ---------- Sitemap page ---------- */
   .doc-wrap{max-width:900px;margin:0 auto;padding:56px 24px 100px;}
   .doc-wrap h1{font-size:28px;margin:0 0 8px;}
@@ -394,7 +428,8 @@ const MENU_DATA = {
         {text:'SoR 造句小巨人', url:'/kids/vocabulary', tag:'改名', note:'選單「SoR 造句小巨人」／頁面標題「SoR 單字小達人」'},
         {text:'SoR 閱讀小傳人', url:'/kids/reading', tag:'改名', note:'選單「SoR 閱讀小傳人」／頁面標題「SoR 閱讀小達人」'},
       ], pill:{text:'所有兒童課程', url:'/kids', tag:'直連'}},
-      {heading:'加盟教室', items:[
+      {heading:'實體據點', items:[
+        {text:'教材展示中心', url:'/kids/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
         {text:'臺北旗艦殿', url:'/locations/taipei', tag:'直連'},
         {text:'桃園旗艦殿', url:'/locations/taoyuan', tag:'直連'},
         {text:'高雄旗艦殿', url:'/locations/kaohsiung', tag:'直連'},
@@ -578,6 +613,8 @@ const EXTRA_PAGES = {
   '/cart': {label:'購物車', heroTitle:'購物車', crumbs:[c('/','首頁'), cur('購物車')]},
   '/kids/highlights': {label:'高光時刻', heroTitle:'高光時刻',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('高光時刻')]},
+  '/kids/reading-assessment-center': {label:'教材展示中心', heroTitle:'教材展示中心',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教材展示中心')]},
   '/adults/highlights': {label:'高光時刻', heroTitle:'高光時刻',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('高光時刻')]},
 };
@@ -614,6 +651,15 @@ const LISTING_SECTIONS = {
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
     {title:'SoR 閱讀小達人', url:'/kids/reading'},
   ]},
+  '/kids/phonics': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
+    {text:'線上', url:null},
+    {text:'實體', url:'/locations/taipei#course-info'},
+  ]},
+  '/locations/taipei': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courses:[{title:'課程1'}, {title:'課程2'}],
+    learnMoreUrl:'/kids/phonics',
+    cta:{text:'查看所有兒童課程', url:'/kids'},
+  },
   '/adults': {type:'courses', heading:'線上課程', cards:[
     {title:'發音聽力三秒教', url:'/adults/pronunciation'},
     {title:'蕭博士專利語調課', url:'/adults/master-class'},
@@ -765,6 +811,48 @@ function renderListingExtra(url){
       </section>
     </div>`;
   }
+  if(cfg.type === 'phonics-detail'){
+    return `<div class="listing-wrap">
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.introHeading}</h2></div>
+        <div class="detail-media"></div>
+      </section>
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.signupHeading}</h2></div>
+        <div class="signup-row">
+          ${cfg.signup.map(s=> s.url
+            ? `<a class="overview-card" href="#${s.url}">${s.text}</a>`
+            : `<div class="overview-card overview-card--end">${s.text}</div>`
+          ).join('')}
+        </div>
+      </section>
+    </div>`;
+  }
+  if(cfg.type === 'location-detail'){
+    return `<div class="listing-wrap">
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.galleryHeading}</h2></div>
+        <div class="gallery-row">
+          ${Array.from({length:cfg.galleryCount}).map(()=>'<div class="gallery-card"></div>').join('')}
+        </div>
+      </section>
+      <section class="listing-group" id="course-info">
+        <div class="listing-group-head"><h2>${cfg.coursesHeading}</h2></div>
+        <div class="course-detail-grid">
+          ${cfg.courses.map(course=>`
+            <div class="course-detail-card">
+              <div class="course-detail-title">${course.title}</div>
+              <div class="course-detail-actions">
+                <a class="course-detail-btn" href="#${cfg.learnMoreUrl}">了解更多</a>
+                <div class="course-detail-btn course-detail-btn--end">報名/參觀</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    </div>
+    <div class="cta-band"><a class="cta-btn" href="#${cfg.cta.url}">${cfg.cta.text}</a></div>`;
+  }
   return '';
 }
 
@@ -780,6 +868,7 @@ const SITE_TREE = [
       {u:'/kids/phonics', l:'SoR 拼讀小達人'},
       {u:'/kids/vocabulary', l:'SoR 單字小達人'},
       {u:'/kids/reading', l:'SoR 閱讀小達人'},
+      {u:'/kids/reading-assessment-center', l:'教材展示中心'},
       {u:'/locations', l:'旗艦殿', children:[
         {u:'/locations/taipei', l:'台北旗艦殿'},
         {u:'/locations/taoyuan', l:'桃園旗艦殿'},
@@ -1145,16 +1234,20 @@ function renderNavMappingPage(){
 ===================================================================== */
 
 function route(){
-  let hash = location.hash.replace(/^#/, '');
-  if(!hash) hash = '/';
+  let raw = location.hash.replace(/^#/, '');
+  if(!raw) raw = '/';
+  const [hash, anchor] = raw.split('#');
   closePanel();
   mobileNavEl.hidden = true;
-  window.scrollTo(0,0);
   updateActiveNav(hash);
 
-  if(hash === '/sitemap') return renderSitemapPage();
-  if(hash === '/nav-mapping') return renderNavMappingPage();
-  return renderHero(hash);
+  if(hash === '/sitemap') renderSitemapPage();
+  else if(hash === '/nav-mapping') renderNavMappingPage();
+  else renderHero(hash);
+
+  const anchorEl = anchor && document.getElementById(anchor);
+  if(anchorEl) anchorEl.scrollIntoView({block:'start'});
+  else window.scrollTo(0,0);
 }
 
 buildTopNav();
