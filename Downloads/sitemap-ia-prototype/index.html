@@ -229,7 +229,18 @@
   @media (max-width:1024px){
     .course-grid{grid-template-columns:repeat(2,1fr);}
     .feature-split{flex-direction:column;}
+    .locations-grid{grid-template-columns:repeat(2,1fr);}
   }
+
+  /* ---------- Locations overview cards (/locations) ---------- */
+  .locations-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .location-card{
+    aspect-ratio:0.91;background:var(--header-gray);
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding:24px 16px;gap:16px;text-align:center;
+  }
+  .location-card-title{font-size:24px;color:var(--text);}
+  .location-card-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
 
   /* ---------- Course & location detail wireframes (/kids/phonics, /locations/taipei) ---------- */
   .detail-media{width:100%;aspect-ratio:2.6;background:var(--header-gray);}
@@ -256,6 +267,25 @@
   .course-detail-btn--end{cursor:default;}
 
   /* ---------- Tabbed course switcher (/kids/online-info) ---------- */
+  .online-info-intro{text-align:center;margin-bottom:32px;}
+  .online-info-intro h2{font-size:28px;font-weight:600;margin:0 0 8px;color:var(--text);}
+  .online-info-intro p{font-size:15px;color:var(--muted);margin:0;}
+  .online-info-cards{display:flex;gap:24px;margin-bottom:48px;}
+  .online-info-course-card{
+    flex:1;border:1px solid var(--border);border-radius:8px;padding:28px;
+    display:flex;flex-direction:column;gap:14px;
+    transition:box-shadow .15s ease,border-color .15s ease;
+  }
+  .online-info-course-card:hover{border-color:var(--border-2);box-shadow:0 4px 14px rgba(0,0,0,.06);}
+  .online-info-badge{
+    align-self:flex-start;background:#f2f2f2;color:var(--text);
+    font-size:12px;font-weight:500;padding:4px 10px;border-radius:100px;
+  }
+  .online-info-course-card h3{font-size:18px;font-weight:600;margin:0;color:var(--text);}
+  .online-info-course-card p{font-size:13px;line-height:1.6;color:var(--muted);margin:0;flex:1;}
+  .online-info-learn-more{font-size:13px;font-weight:600;color:var(--dark-2);}
+  .online-info-course-card:hover .online-info-learn-more{text-decoration:underline;}
+
   .tab-group-wrap{display:flex;justify-content:center;margin-bottom:40px;}
   .tab-group{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--intent-gray);}
   .tab-pill{padding:8px 24px;border-radius:999px;font-size:13px;font-weight:700;color:#b3b3b3;transition:background .15s ease,color .15s ease;}
@@ -272,6 +302,7 @@
     .signup-row{flex-direction:column;}
     .gallery-row{flex-direction:column;}
     .online-info-grid{flex-direction:column;}
+    .online-info-cards{flex-direction:column;}
     .tab-group{flex-wrap:wrap;justify-content:center;}
   }
 
@@ -437,7 +468,7 @@ const MENU_DATA = {
         {text:'SoR 拼讀小達人', url:'/kids/phonics', tag:'直連'},
         {text:'SoR 造句小巨人', url:'/kids/vocabulary', tag:'改名', note:'選單「SoR 造句小巨人」／頁面標題「SoR 單字小達人」'},
         {text:'SoR 閱讀小傳人', url:'/kids/reading', tag:'改名', note:'選單「SoR 閱讀小傳人」／頁面標題「SoR 閱讀小達人」'},
-      ]},
+      ], pill:{text:'所有線上課程', url:'/kids/online-info', tag:'直連'}},
       {heading:'實體據點', items:[
         {text:'教材展示中心', url:'/kids/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
         {text:'閱讀聽力檢測', url:'/kids/listening-assessment', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
@@ -486,9 +517,14 @@ const MENU_DATA = {
     columns:[
       {heading:'教材', items:[
         {text:'SoR 原創教材商店', url:'/shop', tag:'直連'},
+        {text:'背單字工具組', url:'/vocab-toolkit', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
         {text:'點讀專區（4 子頁）', url:'/mi-pen', tag:'直連', note:'sitemap 僅列出父頁，未列出選單標註的 4 個子頁'},
         {text:'勘誤專區', url:'/support/errata', tag:'直連'},
-        {text:'免費資源', url:'/resources', tag:'直連'},
+      ]},
+      {heading:'免費資源分類', items:[
+        {text:'分類一', url:'/resources', tag:'待確認', note:'線框稿僅標示佔位分類名稱，sitemap 無對應子分類頁面'},
+        {text:'分類二', url:'/resources', tag:'待確認', note:'線框稿僅標示佔位分類名稱，sitemap 無對應子分類頁面'},
+        {text:'分類三', url:'/resources', tag:'待確認', note:'線框稿僅標示佔位分類名稱，sitemap 無對應子分類頁面'},
       ]},
     ]
   },
@@ -570,6 +606,8 @@ const PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('台北旗艦殿')]},
   '/locations/taoyuan': {label:'桃園旗艦殿', heroTitle:'桃園旗艦殿',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('桃園旗艦殿')]},
+  '/locations/changhua': {label:'彰化旗艦殿', heroTitle:'彰化旗艦殿',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('彰化旗艦殿')]},
   '/locations/kaohsiung': {label:'高雄旗艦殿', heroTitle:'高雄旗艦殿',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), c('/locations','旗艦殿總覽'), cur('高雄旗艦殿')]},
 
@@ -615,6 +653,8 @@ const PAGES = {
 
 // EXTRA: pages that exist only because a menu item had no sitemap match (待確認)
 const EXTRA_PAGES = {
+  '/vocab-toolkit': {label:'背單字工具組', heroTitle:'背單字工具組',
+    crumbs:[c('/','首頁'), cur('精選教材'), cur('背單字工具組')]},
   '/resources/guide': {label:'五階段選書指南', heroTitle:'五階段選書指南',
     crumbs:[c('/','首頁'), cur('精選教材'), c('/resources','免費資源'), cur('五階段選書指南')]},
   '/resources/self-study': {label:'4-5歲自學方案', heroTitle:'4-5歲自學方案',
@@ -654,11 +694,12 @@ const LISTING_SECTIONS = {
     {title:'成人學習資源', url:'/resources/adults'},
     {title:'兒童學習資源', url:'/resources/kids'},
   ]},
-  '/locations': {type:'cards', cards:[
+  '/locations': {type:'locations-overview', cards:[
     {title:'台北旗艦殿', url:'/locations/taipei'},
     {title:'桃園旗艦殿', url:'/locations/taoyuan'},
+    {title:'彰化旗艦殿', url:'/locations/changhua'},
     {title:'高雄旗艦殿', url:'/locations/kaohsiung'},
-  ], cta:{text:'查看線上課程', url:'/kids'}},
+  ], cta:{text:'查看線上課程', url:'/kids/online-info'}},
   '/kids': {type:'cards', cards:[
     {title:'SoR 拼讀小達人', url:'/kids/phonics'},
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
@@ -666,7 +707,7 @@ const LISTING_SECTIONS = {
   ]},
   '/kids/phonics': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
     {text:'線上', url:'/kids/online-info'},
-    {text:'實體', url:'/locations/taipei#course-info'},
+    {text:'實體', url:'/locations'},
   ]},
   '/kids/vocabulary': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
     {text:'線上', url:'/kids/online-info'},
@@ -676,7 +717,14 @@ const LISTING_SECTIONS = {
     {text:'線上', url:'/kids/online-info'},
     {text:'實體', url:'/locations/taipei#course-info'},
   ]},
-  '/kids/online-info': {type:'online-info', tabs:[
+  '/kids/online-info': {type:'online-info',
+    intro:{heading:'選擇你的線上課程', sub:'先認識三門課程的內容與教學重點，再查看報名資訊與費用'},
+    courses:[
+      {badge:'拼讀', title:'SoR 拼讀小達人', desc:'從字母拼讀原則入門，建立解碼能力，適合初階學習者。', url:'/kids/phonics'},
+      {badge:'造句', title:'SoR 造句小達人', desc:'銜接拼讀能力，練習組句與基礎文法，強化表達能力。', url:'/kids/vocabulary'},
+      {badge:'閱讀', title:'SoR 閱讀小達人', desc:'整合拼讀與詞彙能力，培養獨立閱讀與理解能力。', url:'/kids/reading'},
+    ],
+    tabs:[
     {key:'phonics', text:'拼讀小達人'},
     {key:'vocabulary', text:'造句小達人'},
     {key:'reading', text:'閱讀小達人'},
@@ -684,7 +732,22 @@ const LISTING_SECTIONS = {
   '/locations/taipei': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
     courses:[{title:'課程1'}, {title:'課程2'}],
     learnMoreUrl:'/kids/phonics',
-    cta:{text:'查看所有兒童課程', url:'/kids'},
+    cta:{text:'查看所有兒童學程', url:'/kids'},
+  },
+  '/locations/taoyuan': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courses:[{title:'課程1'}, {title:'課程2'}],
+    learnMoreUrl:'/kids/phonics',
+    cta:{text:'查看所有兒童學程', url:'/kids'},
+  },
+  '/locations/changhua': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courses:[{title:'課程1'}, {title:'課程2'}],
+    learnMoreUrl:'/kids/phonics',
+    cta:{text:'查看所有兒童學程', url:'/kids'},
+  },
+  '/locations/kaohsiung': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courses:[{title:'課程1'}, {title:'課程2'}],
+    learnMoreUrl:'/kids/phonics',
+    cta:{text:'查看所有兒童學程', url:'/kids'},
   },
   '/adults': {type:'courses', heading:'線上課程', cards:[
     {title:'發音聽力三秒教', url:'/adults/pronunciation'},
@@ -820,6 +883,22 @@ function renderListingExtra(url){
       ${cfg.cards.map(c=>`<a class="overview-card" href="#${c.url}">${c.title}</a>`).join('')}
     </div>${ctaHTML}`;
   }
+  if(cfg.type === 'locations-overview'){
+    const ctaHTML = cfg.cta ? `<div class="cta-band"><a class="cta-btn" href="#${cfg.cta.url}">${cfg.cta.text}</a></div>` : '';
+    return `<div class="overview-wrap">
+      <div class="locations-grid">
+        ${cfg.cards.map(c=>`
+          <div class="location-card">
+            <div class="location-card-title">${c.title}</div>
+            <div class="location-card-actions">
+              <a class="course-detail-btn" href="#${c.url}">了解更多</a>
+              <a class="course-detail-btn" href="#${c.url}#course-info">查看開課資訊</a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>${ctaHTML}`;
+  }
   if(cfg.type === 'courses'){
     return `<div class="listing-wrap">
       <section class="listing-group">
@@ -856,7 +935,24 @@ function renderListingExtra(url){
     </div>`;
   }
   if(cfg.type === 'online-info'){
+    const coursesHTML = cfg.courses ? `
+      <div class="online-info-intro">
+        <h2>${cfg.intro.heading}</h2>
+        <p>${cfg.intro.sub}</p>
+      </div>
+      <div class="online-info-cards">
+        ${cfg.courses.map(course=>`
+          <div class="online-info-course-card">
+            <span class="online-info-badge">${course.badge}</span>
+            <h3>${course.title}</h3>
+            <p>${course.desc}</p>
+            <a class="online-info-learn-more" href="#${course.url}">了解更多 ${course.title.replace('SoR ','')} →</a>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
     return `<div class="listing-wrap">
+      ${coursesHTML}
       <div class="tab-group-wrap">
         <div class="tab-group" data-tab-group>
           ${cfg.tabs.map((t,i)=>`<button type="button" class="tab-pill${i===0?' active':''}" data-tab="${t.key}">${t.text}</button>`).join('')}
@@ -913,6 +1009,7 @@ const SITE_TREE = [
       {u:'/locations', l:'旗艦殿', children:[
         {u:'/locations/taipei', l:'台北旗艦殿'},
         {u:'/locations/taoyuan', l:'桃園旗艦殿'},
+        {u:'/locations/changhua', l:'彰化旗艦殿'},
         {u:'/locations/kaohsiung', l:'高雄旗艦殿'},
       ]},
       {u:'/kids/highlights', l:'高光時刻'},
@@ -940,6 +1037,7 @@ const SITE_TREE = [
       {u:'/blog/testimonials/adults', l:'學員見證（成人）', note:'原成人課程學員見證，搬遷自 /adults/outcome'},
     ]},
     {u:'/shop', l:'SoR 原創教材商店'},
+    {u:'/vocab-toolkit', l:'背單字工具組'},
     {u:'/mi-pen', l:'點讀專區'},
     {u:'/support/errata', l:'勘誤專區'},
     {u:'/member', l:'會員專區(需登入)'},
