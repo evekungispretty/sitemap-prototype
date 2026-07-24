@@ -293,7 +293,7 @@
   .online-info-grid{display:flex;gap:24px;}
   .online-info-card{flex:1;aspect-ratio:1.24;background:var(--header-gray);}
 
-  .cta-band{background:var(--header-gray);padding:56px 24px;display:flex;justify-content:center;margin-top:56px;}
+  .cta-band{background:var(--header-gray);padding:56px 24px;display:flex;gap:16px;justify-content:center;margin-top:56px;}
   .cta-btn{background:var(--dark-2);color:#fff;font-size:14px;font-weight:600;padding:12px 30px;border-radius:24px;}
   .cta-btn:hover{background:#000;}
 
@@ -448,8 +448,9 @@ const MENU_DATA = {
     columns:[
       {heading:'認識我們', items:[
         {text:'什麼是 Science of Reading (SoR)', url:'/about-sor', tag:'改名', note:'選單多加註「(SoR)」／頁面標題「什麼是 Science of Reading」'},
-        {text:'SoR testing 認證架構', url:'/certification', tag:'直連'},
         {text:'認識創辦人', url:'/founder', tag:'改名', note:'選單「認識創辦人」／頁面標題「創辦人介紹:蕭文乾博士」'},
+         {text:'教材展示中心', url:'/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
+        {text:'閱讀聽力檢測中心', url:'/reading-assessment-center#reading-assessment', tag:'待確認', note:'sitemap 無對應頁面；併入「教材展示中心」頁面，以錨點連結至頁內「閱讀檢測」區塊'},
       ]}
     ]
   },
@@ -468,11 +469,10 @@ const MENU_DATA = {
         {text:'SoR 拼讀小達人', url:'/kids/phonics', tag:'直連'},
         {text:'SoR 造句小巨人', url:'/kids/vocabulary', tag:'改名', note:'選單「SoR 造句小巨人」／頁面標題「SoR 單字小達人」'},
         {text:'SoR 閱讀小傳人', url:'/kids/reading', tag:'改名', note:'選單「SoR 閱讀小傳人」／頁面標題「SoR 閱讀小達人」'},
-      ], pill:{text:'所有線上課程', url:'/kids/online-info', tag:'直連'}},
-      {heading:'實體據點', items:[
-        {text:'教材展示中心', url:'/kids/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
-        {text:'閱讀聽力檢測', url:'/kids/reading-assessment-center#reading-assessment', tag:'待確認', note:'sitemap 無對應頁面；併入「教材展示中心」頁面，以錨點連結至頁內「閱讀檢測」區塊'},
-        {text:'所有旗艦殿', url:'/locations', tag:'直連'},
+      ]},
+      {heading:'上課方式', items:[
+        {text:'線上課程', url:'/kids/online', tag:'直連'},
+        {text:'實體課程', url:'/locations', tag:'直連'},
       ]},
       {heading:'教學成果', items:[
         {text:'學員見證', url:'/blog/testimonials/kids', tag:'直連'},
@@ -565,8 +565,6 @@ const PAGES = {
 
   '/about-sor': {label:'什麼是 Science of Reading', heroTitle:'什麼是 Science of Reading',
     crumbs:[c('/','首頁'), cur('認識我們'), cur('什麼是 Science of Reading')]},
-  '/certification': {label:'SoR testing 認證架構', heroTitle:'SoR testing 認證架構',
-    crumbs:[c('/','首頁'), cur('認識我們'), cur('SoR testing 認證架構')]},
   '/founder': {label:'創辦人介紹:蕭文乾博士', heroTitle:'創辦人介紹:蕭文乾博士',
     crumbs:[c('/','首頁'), cur('認識我們'), cur('創辦人介紹:蕭文乾博士')]},
 
@@ -664,7 +662,9 @@ const EXTRA_PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('高光時刻')]},
   '/kids/online-info': {label:'線上方案', heroTitle:'線上方案',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('線上方案')]},
-  '/kids/reading-assessment-center': {label:'教材展示中心', heroTitle:'教材展示中心',
+  '/kids/online': {label:'線上課程', heroTitle:'線上課程',
+    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('線上課程')]},
+  '/reading-assessment-center': {label:'教材展示中心', heroTitle:'教材展示中心',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教材展示中心')]},
   '/adults/highlights': {label:'高光時刻', heroTitle:'高光時刻',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('高光時刻')]},
@@ -697,11 +697,18 @@ const LISTING_SECTIONS = {
     {title:'桃園旗艦殿', url:'/locations/taoyuan'},
     {title:'彰化旗艦殿', url:'/locations/changhua'},
     {title:'高雄旗艦殿', url:'/locations/kaohsiung'},
-  ], cta:{text:'查看線上課程', url:'/kids/online-info'}},
+  ], cta:[
+    {text:'查看線上課程', url:'/kids/online-info'},
+    {text:'線上課程', url:'/kids/online'},
+  ]},
   '/kids': {type:'cards', cards:[
     {title:'SoR 拼讀小達人', url:'/kids/phonics'},
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
     {title:'SoR 閱讀小達人', url:'/kids/reading'},
+  ], cta:{text:'開始旅程', url:'/kids/phonics'}},
+  '/kids/online': {type:'online-intro', heading:'線上開課介紹', count:4, cta:[
+    {text:'查看兒童學程', url:'/kids'},
+    {text:'線上課程', url:'/kids/online-info'},
   ]},
   '/kids/phonics': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
     {text:'線上', url:'/kids/online-info'},
@@ -747,7 +754,7 @@ const LISTING_SECTIONS = {
     learnMoreUrl:'/kids/phonics',
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
-  '/kids/reading-assessment-center': {type:'reading-assessment-center',
+  '/reading-assessment-center': {type:'reading-assessment-center',
     materialsHeading:'教材', assessmentHeading:'閱讀檢測', assessmentAnchor:'reading-assessment'},
   '/adults': {type:'courses', heading:'線上課程', cards:[
     {title:'發音聽力三秒教', url:'/adults/pronunciation'},
@@ -851,6 +858,12 @@ function renderBlogLayout(url){
   </div>`;
 }
 
+function renderCtaBand(cta){
+  if(!cta) return '';
+  const btns = Array.isArray(cta) ? cta : [cta];
+  return `<div class="cta-band">${btns.map(c=>`<a class="cta-btn" href="#${c.url}">${c.text}</a>`).join('')}</div>`;
+}
+
 function renderListingExtra(url){
   const cfg = LISTING_SECTIONS[url];
   if(!cfg) return '';
@@ -878,13 +891,12 @@ function renderListingExtra(url){
     </div>`;
   }
   if(cfg.type === 'cards'){
-    const ctaHTML = cfg.cta ? `<div class="cta-band"><a class="cta-btn" href="#${cfg.cta.url}">${cfg.cta.text}</a></div>` : '';
     return `<div class="overview-wrap">
       ${cfg.cards.map(c=>`<a class="overview-card" href="#${c.url}">${c.title}</a>`).join('')}
-    </div>${ctaHTML}`;
+    </div>${renderCtaBand(cfg.cta)}`;
   }
   if(cfg.type === 'locations-overview'){
-    const ctaHTML = cfg.cta ? `<div class="cta-band"><a class="cta-btn" href="#${cfg.cta.url}">${cfg.cta.text}</a></div>` : '';
+    const ctaHTML = renderCtaBand(cfg.cta);
     return `<div class="overview-wrap">
       <div class="locations-grid">
         ${cfg.cards.map(c=>`
@@ -898,6 +910,16 @@ function renderListingExtra(url){
         `).join('')}
       </div>
     </div>${ctaHTML}`;
+  }
+  if(cfg.type === 'online-intro'){
+    return `<div class="listing-wrap">
+      <section class="listing-group">
+        <div class="listing-group-head"><h2>${cfg.heading}</h2></div>
+        <div class="listing-grid">
+          ${Array.from({length:cfg.count}).map(()=>'<div class="listing-card"></div>').join('')}
+        </div>
+      </section>
+    </div>${renderCtaBand(cfg.cta)}`;
   }
   if(cfg.type === 'courses'){
     return `<div class="listing-wrap">
@@ -997,8 +1019,7 @@ function renderListingExtra(url){
           `).join('')}
         </div>
       </section>
-    </div>
-    <div class="cta-band"><a class="cta-btn" href="#${cfg.cta.url}">${cfg.cta.text}</a></div>`;
+    </div>${renderCtaBand(cfg.cta)}`;
   }
   return '';
 }
@@ -1007,16 +1028,16 @@ function renderListingExtra(url){
 const SITE_TREE = [
   {u:'/', l:'首頁', children:[
     // /about was removed as a page in sitemap.txt — its former children now sit as flat URLs.
+     {u:'/reading-assessment-center', l:'教材展示中心'},
     {u:'/about-sor', l:'什麼是 Science of Reading'},
-    {u:'/certification', l:'SoR testing 認證架構'},
     {u:'/founder', l:'創辦人介紹:蕭文乾博士'},
     {u:'/news', l:'最新消息'},
     {u:'/kids', l:'所有兒童課程', children:[
       {u:'/kids/phonics', l:'SoR 拼讀小達人'},
       {u:'/kids/vocabulary', l:'SoR 單字小達人'},
       {u:'/kids/reading', l:'SoR 閱讀小達人'},
+      {u:'/kids/online', l:'線上課程'},
       {u:'/kids/online-info', l:'線上方案'},
-      {u:'/kids/reading-assessment-center', l:'教材展示中心'},
       {u:'/locations', l:'旗艦殿', children:[
         {u:'/locations/taipei', l:'台北旗艦殿'},
         {u:'/locations/taoyuan', l:'桃園旗艦殿'},
@@ -1184,7 +1205,7 @@ navToggleBtn.addEventListener('click', ()=>{ mobileNavEl.hidden = !mobileNavEl.h
 
 function updateActiveNav(url){
   const map = [
-    {key:'about', test:u=>['/about-sor','/certification','/founder'].includes(u)},
+    {key:'about', test:u=>['/about-sor','/founder'].includes(u)},
     {key:'news', test:u=>u==='/news'},
     {key:'kids', test:u=>u.startsWith('/kids')||u.startsWith('/locations')},
     {key:'adults', test:u=>u.startsWith('/adults')},
