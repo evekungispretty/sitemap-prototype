@@ -305,7 +305,9 @@
 
   .mode-panel-desc{font-size:15px;line-height:1.8;color:#444;margin:0 0 20px;}
 
-  .cta-band{background:var(--header-gray);padding:56px 24px;display:flex;gap:16px;justify-content:center;margin-top:56px;}
+  .cta-band-wrap{background:var(--header-gray);padding:56px 24px;margin-top:56px;text-align:center;}
+  .cta-band-note{font-size:14px;color:var(--muted);margin:0 0 20px;}
+  .cta-band{display:flex;gap:16px;justify-content:center;}
   .cta-btn{background:var(--dark-2);color:#fff;font-size:14px;font-weight:600;padding:12px 30px;border-radius:24px;}
   .cta-btn:hover{background:#000;}
 
@@ -820,10 +822,10 @@ const LISTING_SECTIONS = {
     {title:'桃園旗艦殿', url:'/locations/taoyuan'},
     {title:'彰化旗艦殿', url:'/locations/changhua'},
     {title:'高雄旗艦殿', url:'/locations/kaohsiung'},
-  ], cta:[
+  ], cta:{note:'找不到你的城市？線上課同一套教材、同一批老師', buttons:[
     {text:'查看學程', url:'/kids'},
     {text:'線上課程', url:'/kids/online'},
-  ]},
+  ]}},
   '/kids': {type:'kids-cards', cards:[
     {title:'SoR 拼讀小達人', url:'/kids/phonics'},
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
@@ -986,8 +988,10 @@ function renderBlogLayout(url){
 
 function renderCtaBand(cta){
   if(!cta) return '';
-  const btns = Array.isArray(cta) ? cta : [cta];
-  return `<div class="cta-band">${btns.map(c=>`<a class="cta-btn" href="#${c.url}">${c.text}</a>`).join('')}</div>`;
+  const note = !Array.isArray(cta) && cta.note ? cta.note : null;
+  const btns = Array.isArray(cta) ? cta : (cta.buttons || [cta]);
+  const noteHTML = note ? `<p class="cta-band-note">${note}</p>` : '';
+  return `<div class="cta-band-wrap">${noteHTML}<div class="cta-band">${btns.map(c=>`<a class="cta-btn" href="#${c.url}">${c.text}</a>`).join('')}</div></div>`;
 }
 
 // Shared CTA used at the end of /kids and every /kids/[course] page: "線上報名" is always
