@@ -318,6 +318,50 @@
     .tab-group{flex-wrap:wrap;justify-content:center;}
   }
 
+  /* ---------- CourseModeCTA (線上／實體 dual-track CTA on /kids/* pages) ---------- */
+  .course-mode-cta{max-width:900px;margin:0 auto;text-align:center;}
+  .course-mode-cta-note{font-size:14px;color:var(--muted);margin:0 0 20px;}
+  .course-mode-cta-actions{display:flex;gap:16px;justify-content:center;}
+  .course-mode-cta-btn{font-size:14px;font-weight:600;padding:12px 30px;border-radius:24px;white-space:nowrap;}
+  .course-mode-cta-btn--primary{background:var(--dark-2);color:#fff;}
+  .course-mode-cta-btn--primary:hover{background:#000;}
+  .course-mode-cta-btn--secondary{background:#fff;color:var(--text);border:1px solid var(--border-2);}
+  .course-mode-cta-btn--secondary:hover{background:var(--header-gray);}
+
+  .course-detail-grid--3{grid-template-columns:repeat(3,1fr);}
+
+  @media (max-width:1024px){
+    .course-mode-cta-actions{flex-direction:column;}
+    .course-mode-cta-btn{width:100%;text-align:center;}
+    .course-detail-grid--3{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Course modal (/locations/[city] 「了解更多」) ---------- */
+  body.scroll-locked{overflow:hidden;}
+  .course-modal-overlay{
+    position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .course-modal-overlay[hidden]{display:none;}
+  .course-modal{
+    position:relative;background:#fff;border-radius:12px;max-width:520px;width:100%;
+    max-height:85vh;overflow:auto;padding:40px 36px 36px;box-shadow:0 24px 60px rgba(0,0,0,.25);
+  }
+  .course-modal-close{
+    position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:var(--muted);
+  }
+  .course-modal-close:hover{background:var(--header-gray);color:var(--text);}
+  .course-modal-title{font-size:22px;font-weight:700;margin:0 0 16px;padding-right:32px;}
+  .course-modal-summary{font-size:15px;line-height:1.8;color:#444;margin:0 0 24px;}
+  .course-modal-link{font-size:14px;font-weight:600;color:var(--dark-2);}
+  .course-modal-link:hover{text-decoration:underline;}
+
+  @media (max-width:1024px){
+    .course-modal-overlay{padding:0;align-items:flex-end;}
+    .course-modal{max-width:none;width:100%;max-height:90vh;border-radius:16px 16px 0 0;}
+  }
+
   /* ---------- Sitemap page ---------- */
   .doc-wrap{max-width:900px;margin:0 auto;padding:56px 24px 100px;}
   .doc-wrap h1{font-size:28px;margin:0 0 8px;}
@@ -409,6 +453,8 @@
 </header>
 
 <main id="app"></main>
+
+<div class="course-modal-overlay" id="courseModalOverlay" hidden></div>
 
 <script>
 /* =====================================================================
@@ -686,6 +732,30 @@ const EXTRA_PAGES = {
 
 const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
 
+// Shared course framework content — single source of truth for both the /kids/* detail
+// pages and the /locations/[city] "了解更多" modal, so the two never drift out of sync.
+// NOTE: placeholder copy, not final marketing copy — replace with real course descriptions.
+const COURSE_FRAMEWORK_CONTENT = {
+  phonics: {
+    key:'phonics', title:'SoR 拼讀小達人', url:'/kids/phonics',
+    summary:'（佔位文案）從字母與發音的對應規則入門，建立孩子的解碼（decoding）能力，並透過重複拼讀練習養成自動化辨識單字的能力，適合剛開始學習英文閱讀的初階學習者。',
+  },
+  vocabulary: {
+    key:'vocabulary', title:'SoR 單字小達人', url:'/kids/vocabulary',
+    summary:'（佔位文案）銜接拼讀所建立的解碼基礎，透過情境例句與造句練習擴充字彙量，同時強化基礎文法概念，讓孩子能把認得的字組成完整、有意義的句子。',
+  },
+  reading: {
+    key:'reading', title:'SoR 閱讀小達人', url:'/kids/reading',
+    summary:'（佔位文案）整合拼讀與詞彙能力，透過分級讀本與提問引導，培養孩子獨立閱讀、理解文意與統整資訊的能力，逐步建立自主閱讀的習慣。',
+  },
+};
+
+// Cities allowed in the ?from= query param used to carry "came from which flagship
+// location" context between /locations/[city] and /kids/*. Anything else falls back silently.
+const LOCATION_QUERY_WHITELIST = {
+  taipei:'台北', taoyuan:'桃園', changhua:'彰化', kaohsiung:'高雄',
+};
+
 // Extra section content rendered below the hero on listing/overview pages.
 // 'grouped' = section heading + "所有文章" link (to real sitemap URL) + placeholder image grid.
 // 'cards'   = large clickable overview cards, each linking straight to a real sitemap URL.
@@ -719,23 +789,14 @@ const LISTING_SECTIONS = {
     {title:'SoR 拼讀小達人', url:'/kids/phonics'},
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
     {title:'SoR 閱讀小達人', url:'/kids/reading'},
-  ], cta:{text:'開始旅程', url:'/kids/phonics'}},
+  ], cta:{text:'開始旅程', url:'/kids/phonics'}, showModeCTA:true},
   '/kids/online': {type:'online-intro', heading:'線上開課介紹', count:4, cta:[
     {text:'查看兒童學程', url:'/kids'},
     {text:'線上課程', url:'/kids/online-info'},
   ]},
-  '/kids/phonics': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
-    {text:'線上', url:'/kids/online-info'},
-    {text:'實體', url:'/locations'},
-  ]},
-  '/kids/vocabulary': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
-    {text:'線上', url:'/kids/online-info'},
-    {text:'實體', url:'/locations/taipei#course-info'},
-  ]},
-  '/kids/reading': {type:'phonics-detail', introHeading:'課程介紹', signupHeading:'報名', signup:[
-    {text:'線上', url:'/kids/online-info'},
-    {text:'實體', url:'/locations/taipei#course-info'},
-  ]},
+  '/kids/phonics': {type:'phonics-detail', courseKey:'phonics', introHeading:'課程介紹'},
+  '/kids/vocabulary': {type:'phonics-detail', courseKey:'vocabulary', introHeading:'課程介紹'},
+  '/kids/reading': {type:'phonics-detail', courseKey:'reading', introHeading:'課程介紹'},
   '/adults/pronunciation': {type:'course-modes-detail', introHeading:'課程介紹', signupHeading:'報名',
     modes:[
       {key:'workshop', text:'工作坊', desc:'實體互動工作坊，由老師現場示範發音技巧並即時糾正，適合喜歡面對面練習的學員。', signup:{text:'預約工作坊', url:'/adults/faq'}},
@@ -758,24 +819,20 @@ const LISTING_SECTIONS = {
     {key:'vocabulary', text:'造句小達人'},
     {key:'reading', text:'閱讀小達人'},
   ], count:2},
-  '/locations/taipei': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
-    courses:[{title:'課程1'}, {title:'課程2'}],
-    learnMoreUrl:'/kids/phonics',
+  '/locations/taipei': {type:'location-detail', citySlug:'taipei', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courseKeys:['phonics','vocabulary','reading'],
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
-  '/locations/taoyuan': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
-    courses:[{title:'課程1'}, {title:'課程2'}],
-    learnMoreUrl:'/kids/phonics',
+  '/locations/taoyuan': {type:'location-detail', citySlug:'taoyuan', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courseKeys:['phonics','vocabulary','reading'],
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
-  '/locations/changhua': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
-    courses:[{title:'課程1'}, {title:'課程2'}],
-    learnMoreUrl:'/kids/phonics',
+  '/locations/changhua': {type:'location-detail', citySlug:'changhua', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courseKeys:['phonics','vocabulary','reading'],
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
-  '/locations/kaohsiung': {type:'location-detail', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
-    courses:[{title:'課程1'}, {title:'課程2'}],
-    learnMoreUrl:'/kids/phonics',
+  '/locations/kaohsiung': {type:'location-detail', citySlug:'kaohsiung', galleryHeading:'環境照片', galleryCount:3, coursesHeading:'開課資訊',
+    courseKeys:['phonics','vocabulary','reading'],
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
   '/reading-assessment-center': {type:'reading-assessment-center',
@@ -894,6 +951,32 @@ function renderCtaBand(cta){
   return `<div class="cta-band">${btns.map(c=>`<a class="cta-btn" href="#${c.url}">${c.text}</a>`).join('')}</div>`;
 }
 
+// Shared CTA used at the end of /kids and every /kids/[course] page: "線上報名" is always
+// primary; "找實體旗艦殿" becomes city-specific when the page was reached via ?from=<city>
+// (whitelisted in LOCATION_QUERY_WHITELIST — anything else falls back to the generic /locations link).
+// Accepts overrides for any of note/primaryText/primaryUrl/secondaryText/secondaryUrl.
+function renderCourseModeCTA(overrides = {}){
+  const fromParam = currentParams.get('from');
+  const cityKey = LOCATION_QUERY_WHITELIST[fromParam] ? fromParam : null;
+  const defaults = {
+    note:'這套課程線上與實體皆適用，選擇你方便的上課方式',
+    primaryText:'線上報名',
+    primaryUrl:'/kids/online-info',
+    secondaryText: cityKey ? `回到${LOCATION_QUERY_WHITELIST[cityKey]}旗艦殿報名` : '找實體旗艦殿',
+    secondaryUrl: cityKey ? `/locations/${cityKey}` : '/locations',
+  };
+  const cfg = Object.assign({}, defaults, overrides);
+  return `
+    <section class="course-mode-cta">
+      <p class="course-mode-cta-note">${cfg.note}</p>
+      <div class="course-mode-cta-actions">
+        <a class="course-mode-cta-btn course-mode-cta-btn--primary" href="#${cfg.primaryUrl}">${cfg.primaryText}</a>
+        <a class="course-mode-cta-btn course-mode-cta-btn--secondary" href="#${cfg.secondaryUrl}">${cfg.secondaryText}</a>
+      </div>
+    </section>
+  `;
+}
+
 function renderListingExtra(url){
   const cfg = LISTING_SECTIONS[url];
   if(!cfg) return '';
@@ -923,7 +1006,7 @@ function renderListingExtra(url){
   if(cfg.type === 'cards'){
     return `<div class="overview-wrap">
       ${cfg.cards.map(c=>`<a class="overview-card" href="#${c.url}">${c.title}</a>`).join('')}
-    </div>${renderCtaBand(cfg.cta)}`;
+    </div>${renderCtaBand(cfg.cta)}${cfg.showModeCTA ? renderCourseModeCTA() : ''}`;
   }
   if(cfg.type === 'locations-overview'){
     const ctaHTML = renderCtaBand(cfg.cta);
@@ -1017,20 +1100,14 @@ function renderListingExtra(url){
     </div>`;
   }
   if(cfg.type === 'phonics-detail'){
+    const course = COURSE_FRAMEWORK_CONTENT[cfg.courseKey];
     return `<div class="listing-wrap">
       <section class="listing-group">
         <div class="listing-group-head"><h2>${cfg.introHeading}</h2></div>
+        <p class="mode-panel-desc">${course.summary}</p>
         <div class="detail-media"></div>
       </section>
-      <section class="listing-group">
-        <div class="listing-group-head"><h2>${cfg.signupHeading}</h2></div>
-        <div class="signup-row">
-          ${cfg.signup.map(s=> s.url
-            ? `<a class="overview-card" href="#${s.url}">${s.text}</a>`
-            : `<div class="overview-card overview-card--end">${s.text}</div>`
-          ).join('')}
-        </div>
-      </section>
+      ${renderCourseModeCTA()}
     </div>`;
   }
   if(cfg.type === 'online-info'){
@@ -1084,16 +1161,18 @@ function renderListingExtra(url){
       </section>
       <section class="listing-group" id="course-info">
         <div class="listing-group-head"><h2>${cfg.coursesHeading}</h2></div>
-        <div class="course-detail-grid">
-          ${cfg.courses.map(course=>`
+        <div class="course-detail-grid course-detail-grid--3">
+          ${cfg.courseKeys.map(key=>{
+            const course = COURSE_FRAMEWORK_CONTENT[key];
+            return `
             <div class="course-detail-card">
               <div class="course-detail-title">${course.title}</div>
               <div class="course-detail-actions">
-                <a class="course-detail-btn" href="#${cfg.learnMoreUrl}">了解更多</a>
+                <button type="button" class="course-detail-btn" data-open-course-modal="${course.key}" data-from-city="${cfg.citySlug}">了解更多</button>
                 <div class="course-detail-btn course-detail-btn--end">報名/參觀</div>
               </div>
             </div>
-          `).join('')}
+          `;}).join('')}
         </div>
       </section>
     </div>${renderCtaBand(cfg.cta)}`;
@@ -1253,7 +1332,7 @@ function wireNavInteractions(){
     if(!siteHeaderEl.contains(e.target)) closePanel();
   });
   document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape'){ closePanel(); mobileNavEl.hidden = true; }
+    if(e.key === 'Escape'){ closePanel(); mobileNavEl.hidden = true; closeCourseModal(); }
   });
 }
 
@@ -1303,6 +1382,11 @@ function updateActiveNav(url){
 const app = document.getElementById('app');
 
 app.addEventListener('click', (e)=>{
+  const modalTriggerBtn = e.target.closest('[data-open-course-modal]');
+  if(modalTriggerBtn){
+    openCourseModal(modalTriggerBtn.dataset.openCourseModal, modalTriggerBtn.dataset.fromCity, modalTriggerBtn);
+    return;
+  }
   const tabBtn = e.target.closest('[data-tab]');
   if(tabBtn){
     tabBtn.closest('[data-tab-group]').querySelectorAll('.tab-pill').forEach(p=>p.classList.remove('active'));
@@ -1488,14 +1572,100 @@ function renderNavMappingPage(){
 }
 
 /* =====================================================================
+   COURSE MODAL (opened from /locations/[city] "了解更多")
+===================================================================== */
+
+const courseModalOverlayEl = document.getElementById('courseModalOverlay');
+let courseModalTriggerEl = null;
+let scrollLockPaddingApplied = false;
+
+function renderCourseModalHTML(course, cityKey){
+  const fromQuery = LOCATION_QUERY_WHITELIST[cityKey] ? `?from=${cityKey}` : '';
+  return `
+    <div class="course-modal" role="dialog" aria-modal="true" aria-labelledby="courseModalTitle">
+      <button type="button" class="course-modal-close" data-course-modal-close aria-label="關閉">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h2 class="course-modal-title" id="courseModalTitle">${course.title}</h2>
+      <p class="course-modal-summary">${course.summary}</p>
+      <a class="course-modal-link" href="#${course.url}${fromQuery}">查看完整${course.title.replace('SoR ','')}課程 →</a>
+    </div>
+  `;
+}
+
+function lockBodyScroll(){
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  if(scrollbarWidth > 0){
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+    scrollLockPaddingApplied = true;
+  }
+  document.body.classList.add('scroll-locked');
+}
+function unlockBodyScroll(){
+  document.body.classList.remove('scroll-locked');
+  if(scrollLockPaddingApplied){
+    document.body.style.paddingRight = '';
+    scrollLockPaddingApplied = false;
+  }
+}
+
+function getModalFocusables(){
+  return Array.from(courseModalOverlayEl.querySelectorAll('a[href], button:not([disabled])'));
+}
+
+function openCourseModal(courseKey, cityKey, triggerEl){
+  const course = COURSE_FRAMEWORK_CONTENT[courseKey];
+  if(!course) return;
+  // Captured explicitly rather than read from document.activeElement — Safari doesn't
+  // move focus to a <button> on click, so activeElement wouldn't reliably be the trigger.
+  courseModalTriggerEl = triggerEl || document.activeElement;
+  courseModalOverlayEl.innerHTML = renderCourseModalHTML(course, cityKey);
+  courseModalOverlayEl.hidden = false;
+  lockBodyScroll();
+  const focusables = getModalFocusables();
+  (focusables[0] || courseModalOverlayEl).focus();
+}
+
+function closeCourseModal(){
+  if(courseModalOverlayEl.hidden) return;
+  courseModalOverlayEl.hidden = true;
+  courseModalOverlayEl.innerHTML = '';
+  unlockBodyScroll();
+  if(courseModalTriggerEl && document.contains(courseModalTriggerEl)) courseModalTriggerEl.focus();
+  courseModalTriggerEl = null;
+}
+
+courseModalOverlayEl.addEventListener('click', (e)=>{
+  if(e.target === courseModalOverlayEl || e.target.closest('[data-course-modal-close]')) closeCourseModal();
+});
+
+courseModalOverlayEl.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Tab') return;
+  const focusables = getModalFocusables();
+  if(!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length-1];
+  if(e.shiftKey && document.activeElement === first){
+    e.preventDefault(); last.focus();
+  } else if(!e.shiftKey && document.activeElement === last){
+    e.preventDefault(); first.focus();
+  }
+});
+
+/* =====================================================================
    ROUTER
 ===================================================================== */
+
+// Query params for the current route (e.g. ?from=taipei), re-parsed on every navigation.
+let currentParams = new URLSearchParams();
 
 function route(){
   let raw = location.hash.replace(/^#/, '');
   if(!raw) raw = '/';
-  const [hash, anchor] = raw.split('#');
+  const [pathAndQuery, anchor] = raw.split('#');
+  const [hash, queryString] = pathAndQuery.split('?');
+  currentParams = new URLSearchParams(queryString || '');
   closePanel();
+  closeCourseModal();
   mobileNavEl.hidden = true;
   updateActiveNav(hash);
 
