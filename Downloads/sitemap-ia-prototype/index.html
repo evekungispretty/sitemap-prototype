@@ -208,13 +208,21 @@
   }
 
   /* ---------- Course grid + feature split (/adults landing) ---------- */
+  .course-group{margin-bottom:40px;}
+  .course-group:last-child{margin-bottom:0;}
+  .course-group-title{font-size:18px;font-weight:700;margin:0 0 20px;color:var(--text);}
   .course-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
   .course-card{
     aspect-ratio:0.86;background:var(--header-gray);
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    font-size:20px;padding:16px;transition:background .15s ease;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    gap:14px;font-size:20px;padding:16px;transition:background .15s ease;
   }
   .course-card:hover{background:var(--border-2);}
+  .course-card-modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .mode-tag{
+    font-size:12px;font-weight:600;color:var(--text);background:#fff;
+    padding:4px 12px;border-radius:100px;
+  }
   .feature-split{display:flex;gap:56px;align-items:center;margin-top:72px;}
   .feature-split .feature-image{flex:1 1 50%;aspect-ratio:1.5;background:var(--header-gray);}
   .feature-split .feature-text{flex:1 1 50%;display:flex;flex-direction:column;gap:22px;}
@@ -225,6 +233,8 @@
     font-size:14px;padding:12px 26px;border-radius:22px;
   }
   .feature-split .feature-btn:hover{background:var(--border-2);}
+  .feature-split--card{margin-top:0;}
+  .feature-split .feature-text .course-card-modes{justify-content:flex-start;}
 
   @media (max-width:1024px){
     .course-grid{grid-template-columns:repeat(2,1fr);}
@@ -292,6 +302,8 @@
   .tab-pill.active{background:#195280;color:#fff;}
   .online-info-grid{display:flex;gap:24px;}
   .online-info-card{flex:1;aspect-ratio:1.24;background:var(--header-gray);}
+
+  .mode-panel-desc{font-size:15px;line-height:1.8;color:#444;margin:0 0 20px;}
 
   .cta-band{background:var(--header-gray);padding:56px 24px;display:flex;gap:16px;justify-content:center;margin-top:56px;}
   .cta-btn{background:var(--dark-2);color:#fff;font-size:14px;font-weight:600;padding:12px 30px;border-radius:24px;}
@@ -490,14 +502,16 @@ const MENU_DATA = {
       ]
     },
     columns:[
-      {heading:'線上課程', items:[
+      {heading:'語言學習', items:[
         {text:'發音聽力三秒教', url:'/adults/pronunciation', tag:'直連'},
-        {text:'蕭博士專利語調課', url:'/adults/master-class', tag:'直連'},
-        {text:'專利字典拼讀班', url:'/adults/phonics', tag:'直連'},
         {text:'發音聽力矯正班', url:'/adults/adult-pronunciation', tag:'直連'},
+        {text:'文化班', url:'/adults/culture', tag:'直連'},
       ], pill:{text:'所有成人課程', url:'/adults', tag:'直連'}},
-      {heading:'就業培訓', items:[
-        {text:'師資培訓（正音師之路）', url:'/adults/teacher-training', tag:'直連'},
+      {heading:'親職教育', items:[
+        {text:'小達人家長班', url:'/adults/parent-class', tag:'直連'},
+      ]},
+      {heading:'師資培訓', items:[
+        {text:'大師班', url:'/adults/teacher-training', tag:'直連'},
       ]},
       {heading:'教學成果', items:[
         {text:'學員見證', url:'/blog/testimonials/adults', tag:'直連'},
@@ -612,13 +626,13 @@ const PAGES = {
   '/adults': {label:'所有成人課程', heroTitle:'所有成人課程', crumbs:[c('/','首頁'), cur('所有成人課程')]},
   '/adults/pronunciation': {label:'發音聽力三秒教', heroTitle:'發音聽力三秒教',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('發音聽力三秒教')]},
-  '/adults/master-class': {label:'蕭博士專利語調課', heroTitle:'蕭博士專利語調課',
-    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('蕭博士專利語調課')]},
-  '/adults/phonics': {label:'專利字典拼讀班', heroTitle:'專利字典拼讀班',
-    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('專利字典拼讀班')]},
   '/adults/adult-pronunciation': {label:'發音聽力矯正班', heroTitle:'發音聽力矯正班',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('發音聽力矯正班')]},
-  '/adults/teacher-training': {label:'師資培訓(正音師之路)', heroTitle:'師資培訓(正音師之路)',
+  '/adults/culture': {label:'文化班', heroTitle:'文化班',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('文化班')]},
+  '/adults/parent-class': {label:'小達人家長班', heroTitle:'小達人家長班',
+    crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('小達人家長班')]},
+  '/adults/teacher-training': {label:'大師班', heroTitle:'大師班',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('師資培訓(正音師之路)')]},
   '/adults/online': {label:'成人線上課程', heroTitle:'成人線上課程',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('成人線上課程')]},
@@ -722,6 +736,16 @@ const LISTING_SECTIONS = {
     {text:'線上', url:'/kids/online-info'},
     {text:'實體', url:'/locations/taipei#course-info'},
   ]},
+  '/adults/pronunciation': {type:'course-modes-detail', introHeading:'課程介紹', signupHeading:'報名',
+    modes:[
+      {key:'workshop', text:'工作坊', desc:'實體互動工作坊，由老師現場示範發音技巧並即時糾正，適合喜歡面對面練習的學員。', signup:{text:'預約工作坊', url:'/adults/faq'}},
+      {key:'video', text:'影音', desc:'線上影音課程，可依自己的步調反覆觀看練習，隨時隨地學習。', signup:{text:'購買影音課程', url:'/resources/adults'}},
+    ]},
+  '/adults/culture': {type:'course-modes-detail', introHeading:'課程介紹', signupHeading:'報名',
+    modes:[
+      {key:'workshop', text:'工作坊', desc:'實體文化工作坊，透過情境活動與討論認識英語系文化脈絡。', signup:{text:'預約工作坊', url:'/adults/faq'}},
+      {key:'video', text:'影音', desc:'線上影音課程，以主題單元介紹文化背景知識，可隨時觀看複習。', signup:{text:'購買影音課程', url:'/resources/adults'}},
+    ]},
   '/kids/online-info': {type:'online-info',
     intro:{heading:'選擇你的線上課程', sub:'先認識三門課程的內容與教學重點，再查看報名資訊與費用'},
     courses:[
@@ -756,11 +780,17 @@ const LISTING_SECTIONS = {
   },
   '/reading-assessment-center': {type:'reading-assessment-center',
     materialsHeading:'教材', assessmentHeading:'閱讀檢測', assessmentAnchor:'reading-assessment'},
-  '/adults': {type:'courses', heading:'線上課程', cards:[
-    {title:'發音聽力三秒教', url:'/adults/pronunciation'},
-    {title:'蕭博士專利語調課', url:'/adults/master-class'},
-    {title:'專利字典拼讀班', url:'/adults/phonics'},
-    {title:'發音聽力矯正班', url:'/adults/adult-pronunciation'},
+  '/adults': {type:'courses', heading:'成人課程', groups:[
+    {heading:'語言學習', cards:[
+      {title:'發音聽力三秒教', url:'/adults/pronunciation', modes:['工作坊','影音']},
+      {title:'發音聽力矯正班', url:'/adults/adult-pronunciation', modes:['線上課程']},
+      {title:'文化班', url:'/adults/culture', modes:['工作坊','影音']},
+    ]},
+    {heading:'親職教育', layout:'feature', cards:[
+      {title:'小達人家長班', url:'/adults/parent-class', modes:['線上課程'],
+        body:'專為家長設計的線上課程，教您如何在家陪伴孩子練習發音與閱讀，透過簡單易懂的方法，讓親子共學更有效率。',
+        btnText:'了解小達人家長班課程'},
+    ]},
   ], feature:{
     title:'就業培訓',
     body:'我們為希望成為正音師的夥伴提供全面的師資培訓計劃，內容包括基於研究的教學策略，旨在提升教學示範的質量，並確保培訓的有效性。',
@@ -904,7 +934,6 @@ function renderListingExtra(url){
             <div class="location-card-title">${c.title}</div>
             <div class="location-card-actions">
               <a class="course-detail-btn" href="#${c.url}">了解更多</a>
-              <a class="course-detail-btn" href="#${c.url}#course-info">查看開課資訊</a>
             </div>
           </div>
         `).join('')}
@@ -922,12 +951,34 @@ function renderListingExtra(url){
     </div>${renderCtaBand(cfg.cta)}`;
   }
   if(cfg.type === 'courses'){
+    const cardHTML = c=>`
+      <a class="course-card" href="#${c.url}">
+        <span class="course-card-title">${c.title}</span>
+        ${c.modes ? `<span class="course-card-modes">${c.modes.map(m=>`<span class="mode-tag">${m}</span>`).join('')}</span>` : ''}
+      </a>
+    `;
+    const featureCardHTML = c=>`
+      <div class="feature-split feature-split--card">
+        <div class="feature-text">
+          <h3>${c.title}</h3>
+          ${c.modes ? `<span class="course-card-modes">${c.modes.map(m=>`<span class="mode-tag">${m}</span>`).join('')}</span>` : ''}
+          <p>${c.body}</p>
+          <a class="feature-btn" href="#${c.url}">${c.btnText}</a>
+        </div>
+        <div class="feature-image"></div>
+      </div>
+    `;
     return `<div class="listing-wrap">
       <section class="listing-group">
         <div class="listing-group-head"><h2>${cfg.heading}</h2></div>
-        <div class="course-grid">
-          ${cfg.cards.map(c=>`<a class="course-card" href="#${c.url}">${c.title}</a>`).join('')}
-        </div>
+        ${cfg.groups.map(g=>`
+          <div class="course-group">
+            <h3 class="course-group-title">${g.heading}</h3>
+            ${g.layout === 'feature'
+              ? g.cards.map(featureCardHTML).join('')
+              : `<div class="course-grid">${g.cards.map(cardHTML).join('')}</div>`}
+          </div>
+        `).join('')}
       </section>
       <section class="feature-split">
         <div class="feature-image"></div>
@@ -937,6 +988,32 @@ function renderListingExtra(url){
           <a class="feature-btn" href="#${cfg.feature.url}">${cfg.feature.btnText}</a>
         </div>
       </section>
+    </div>`;
+  }
+  if(cfg.type === 'course-modes-detail'){
+    const tabsHTML = cfg.modes.map((m,i)=>`<button type="button" class="tab-pill${i===0?' active':''}" data-tab="${m.key}">${m.text}</button>`).join('');
+    const panelsHTML = cfg.modes.map((m,i)=>`
+      <div class="mode-panel" data-tab-panel="${m.key}"${i===0?'':' hidden'}>
+        <section class="listing-group">
+          <div class="listing-group-head"><h2>${cfg.introHeading}</h2></div>
+          <p class="mode-panel-desc">${m.desc}</p>
+          <div class="detail-media"></div>
+        </section>
+        <section class="listing-group">
+          <div class="listing-group-head"><h2>${cfg.signupHeading}</h2></div>
+          <div class="signup-row">
+            ${m.signup.url
+              ? `<a class="overview-card" href="#${m.signup.url}">${m.signup.text}</a>`
+              : `<div class="overview-card overview-card--end">${m.signup.text}</div>`}
+          </div>
+        </section>
+      </div>
+    `).join('');
+    return `<div class="listing-wrap">
+      <div class="tab-group-wrap">
+        <div class="tab-group" data-tab-group>${tabsHTML}</div>
+      </div>
+      ${panelsHTML}
     </div>`;
   }
   if(cfg.type === 'phonics-detail'){
@@ -1049,10 +1126,10 @@ const SITE_TREE = [
     ]},
     {u:'/adults', l:'成人課程', children:[
       {u:'/adults/pronunciation', l:'發音聽力三秒教'},
-      {u:'/adults/master-class', l:'蕭博士專利語調課'},
-      {u:'/adults/phonics', l:'專利字典拼讀班'},
       {u:'/adults/adult-pronunciation', l:'發音聽力矯正班'},
-      {u:'/adults/teacher-training', l:'師資培訓(正音師之路)'},
+      {u:'/adults/culture', l:'文化班'},
+      {u:'/adults/parent-class', l:'小達人家長班'},
+      {u:'/adults/teacher-training', l:'大師班'},
       {u:'/adults/highlights', l:'高光時刻'},
       {u:'/adults/faq', l:'常見問題'},
     ]},
@@ -1230,6 +1307,10 @@ app.addEventListener('click', (e)=>{
   if(tabBtn){
     tabBtn.closest('[data-tab-group]').querySelectorAll('.tab-pill').forEach(p=>p.classList.remove('active'));
     tabBtn.classList.add('active');
+    const key = tabBtn.dataset.tab;
+    app.querySelectorAll('[data-tab-panel]').forEach(panel=>{
+      panel.hidden = panel.dataset.tabPanel !== key;
+    });
     return;
   }
   const expandBtn = e.target.closest('[data-filter-expand-toggle]');
