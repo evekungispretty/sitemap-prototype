@@ -329,12 +329,51 @@
   .course-mode-cta-btn--secondary:hover{background:var(--header-gray);}
 
   .course-detail-grid--3{grid-template-columns:repeat(3,1fr);}
+  .mode-panel-cta{margin-top:32px;}
 
   @media (max-width:1024px){
     .course-mode-cta-actions{flex-direction:column;}
     .course-mode-cta-btn{width:100%;text-align:center;}
     .course-detail-grid--3{grid-template-columns:1fr;}
   }
+
+  /* ---------- Kids course overview cards (/kids) with delivery-mode pills ---------- */
+  .kids-overview-wrap{max-width:var(--content-max);margin:0 auto;padding:100px 48px;}
+  .kids-course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:920px;margin:0 auto;}
+  .kids-course-card{
+    aspect-ratio:0.91;background:var(--header-gray);
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding:24px 16px;gap:16px;text-align:center;
+  }
+  .kids-course-title{font-size:24px;color:var(--text);}
+  .kids-mode-pills{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .kids-mode-pill{
+    background:var(--dark-2);color:#fff;font-size:14px;font-weight:600;
+    padding:10px 22px;border-radius:22px;white-space:nowrap;
+  }
+  .kids-mode-pill:hover{background:#000;}
+
+  @media (max-width:1024px){
+    .kids-overview-wrap{padding:56px 20px;}
+    .kids-course-grid{grid-template-columns:repeat(2,1fr);}
+  }
+
+  /* ---------- Taiwan location map (in-person tab on /kids/[course]) ---------- */
+  .taiwan-map{position:relative;max-width:300px;margin:0 auto;}
+  .taiwan-map-svg{width:100%;height:auto;display:block;}
+  .taiwan-map-path{fill:var(--header-gray);stroke:var(--border-2);stroke-width:2;}
+  .map-pin{
+    position:absolute;transform:translate(-50%,-50%);
+    display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text);
+    white-space:nowrap;
+  }
+  .map-pin-dot{
+    width:12px;height:12px;border-radius:50%;background:var(--dark-2);
+    border:2px solid #fff;box-shadow:0 0 0 1px var(--border-2);flex-shrink:0;
+  }
+  .map-pin-label{background:#fff;padding:3px 10px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+  .map-pin:hover .map-pin-dot{background:#000;}
+  .map-pin:hover .map-pin-label{text-decoration:underline;}
 
   /* ---------- Course modal (/locations/[city] 「了解更多」) ---------- */
   body.scroll-locked{overflow:hidden;}
@@ -782,21 +821,21 @@ const LISTING_SECTIONS = {
     {title:'彰化旗艦殿', url:'/locations/changhua'},
     {title:'高雄旗艦殿', url:'/locations/kaohsiung'},
   ], cta:[
-    {text:'查看線上課程', url:'/kids/online-info'},
+    {text:'查看學程', url:'/kids'},
     {text:'線上課程', url:'/kids/online'},
   ]},
-  '/kids': {type:'cards', cards:[
+  '/kids': {type:'kids-cards', cards:[
     {title:'SoR 拼讀小達人', url:'/kids/phonics'},
     {title:'SoR 單字小達人', url:'/kids/vocabulary'},
     {title:'SoR 閱讀小達人', url:'/kids/reading'},
-  ], cta:{text:'開始旅程', url:'/kids/phonics'}, showModeCTA:true},
+  ], cta:{text:'開始旅程', url:'/kids/phonics'}},
   '/kids/online': {type:'online-intro', heading:'線上開課介紹', count:4, cta:[
     {text:'查看兒童學程', url:'/kids'},
     {text:'線上課程', url:'/kids/online-info'},
   ]},
-  '/kids/phonics': {type:'phonics-detail', courseKey:'phonics', introHeading:'課程介紹'},
-  '/kids/vocabulary': {type:'phonics-detail', courseKey:'vocabulary', introHeading:'課程介紹'},
-  '/kids/reading': {type:'phonics-detail', courseKey:'reading', introHeading:'課程介紹'},
+  '/kids/phonics': {type:'phonics-detail', courseKey:'phonics', introHeading:'課程內容介紹'},
+  '/kids/vocabulary': {type:'phonics-detail', courseKey:'vocabulary', introHeading:'課程內容介紹'},
+  '/kids/reading': {type:'phonics-detail', courseKey:'reading', introHeading:'課程內容介紹'},
   '/adults/pronunciation': {type:'course-modes-detail', introHeading:'課程介紹', signupHeading:'報名',
     modes:[
       {key:'workshop', text:'工作坊', desc:'實體互動工作坊，由老師現場示範發音技巧並即時糾正，適合喜歡面對面練習的學員。', signup:{text:'預約工作坊', url:'/adults/faq'}},
@@ -977,6 +1016,30 @@ function renderCourseModeCTA(overrides = {}){
   `;
 }
 
+// Approximate positions (as % of the .taiwan-map bounding box) for each flagship location,
+// keyed by the same city slugs as LOCATION_QUERY_WHITELIST. Illustrative wireframe map, not
+// geographically precise.
+const TAIWAN_MAP_PINS = {
+  taipei:    {label:'台北旗艦殿', left:54, top:11},
+  taoyuan:   {label:'桃園旗艦殿', left:47, top:19},
+  changhua:  {label:'彰化旗艦殿', left:28, top:48},
+  kaohsiung: {label:'高雄旗艦殿', left:43, top:84},
+};
+
+function renderTaiwanMap(){
+  const pins = Object.entries(TAIWAN_MAP_PINS).map(([slug,p])=>`
+    <a class="map-pin" style="left:${p.left}%;top:${p.top}%;" href="#/locations/${slug}">
+      <span class="map-pin-dot"></span><span class="map-pin-label">${p.label}</span>
+    </a>
+  `).join('');
+  return `<div class="taiwan-map">
+    <svg class="taiwan-map-svg" viewBox="0 0 200 400" aria-hidden="true">
+      <path class="taiwan-map-path" d="M110,10 C130,15 140,40 140,60 C148,90 152,130 145,180 C150,210 140,230 130,240 C125,270 118,310 110,340 C104,360 100,375 95,380 C88,365 78,350 70,340 C58,300 50,240 50,180 C48,150 42,160 40,150 C38,120 50,90 55,90 C60,60 70,40 75,40 C85,25 95,15 110,10 Z"/>
+    </svg>
+    ${pins}
+  </div>`;
+}
+
 function renderListingExtra(url){
   const cfg = LISTING_SECTIONS[url];
   if(!cfg) return '';
@@ -1006,6 +1069,26 @@ function renderListingExtra(url){
   if(cfg.type === 'cards'){
     return `<div class="overview-wrap">
       ${cfg.cards.map(c=>`<a class="overview-card" href="#${c.url}">${c.title}</a>`).join('')}
+    </div>${renderCtaBand(cfg.cta)}${cfg.showModeCTA ? renderCourseModeCTA() : ''}`;
+  }
+  if(cfg.type === 'kids-cards'){
+    // Each card links to the course page; the 線上/實體課 pills are shortcuts straight into
+    // that course's matching tab (see 'phonics-detail' below, which reads ?mode=).
+    const modePills = [
+      {text:'線上', mode:'online'},
+      {text:'實體課', mode:'in-person'},
+    ];
+    return `<div class="kids-overview-wrap">
+      <div class="kids-course-grid">
+        ${cfg.cards.map(c=>`
+          <div class="kids-course-card">
+            <a class="kids-course-title" href="#${c.url}">${c.title}</a>
+            <div class="kids-mode-pills">
+              ${modePills.map(m=>`<a class="kids-mode-pill" href="#${c.url}?mode=${m.mode}">${m.text}</a>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
     </div>${renderCtaBand(cfg.cta)}${cfg.showModeCTA ? renderCourseModeCTA() : ''}`;
   }
   if(cfg.type === 'locations-overview'){
@@ -1101,13 +1184,44 @@ function renderListingExtra(url){
   }
   if(cfg.type === 'phonics-detail'){
     const course = COURSE_FRAMEWORK_CONTENT[cfg.courseKey];
+    // Deep-linked from the 線上/實體課 pills on /kids (?mode=online|in-person), so the visitor
+    // lands straight on the tab matching the pill they clicked.
+    const initialMode = currentParams.get('mode') === 'in-person' ? 'in-person' : 'online';
+    const modeTabs = [
+      {key:'online', text:'線上',
+        desc:`（佔位文案）在家透過直播互動小班上課，老師即時帶讀「${course.title}」內容並即時修正發音，並提供課後練習平台鞏固所學，適合行程彈性、希望省去往返時間的家庭。`},
+      {key:'in-person', text:'實體課',
+        desc:`（佔位文案）於實體旗艦殿由老師面對面帶領「${course.title}」課程，透過教具、白板與同儕互動加深學習印象，並可就近參觀教室、預約試聽。`},
+    ];
+    // Reuses the ?from=<city> convention from renderCourseModeCTA so the in-person CTA can
+    // point straight back at the flagship location the visitor came from.
+    const fromParam = currentParams.get('from');
+    const cityKey = LOCATION_QUERY_WHITELIST[fromParam] ? fromParam : null;
+    const modeCTAs = {
+      online: `<div class="course-mode-cta-actions">
+        <a class="course-mode-cta-btn course-mode-cta-btn--primary" href="#/kids/online-info">線上方案</a>
+        <a class="course-mode-cta-btn course-mode-cta-btn--secondary" href="#/resources/kids">立即預約體驗</a>
+      </div>`,
+      'in-person': `<div class="course-mode-cta-actions">
+        <a class="course-mode-cta-btn course-mode-cta-btn--primary" href="#${cityKey ? `/locations/${cityKey}` : '/locations'}">立即預約體驗</a>
+      </div>`,
+    };
+    const tabsHTML = modeTabs.map(t=>`<button type="button" class="tab-pill${t.key===initialMode?' active':''}" data-tab="${t.key}">${t.text}</button>`).join('');
+    const panelsHTML = modeTabs.map(t=>`
+      <div data-tab-panel="${t.key}"${t.key===initialMode?'':' hidden'}>
+        <p class="mode-panel-desc">${t.desc}</p>
+        ${t.key==='in-person' ? renderTaiwanMap() : '<div class="detail-media"></div>'}
+        <div class="course-mode-cta mode-panel-cta">${modeCTAs[t.key]}</div>
+      </div>
+    `).join('');
     return `<div class="listing-wrap">
       <section class="listing-group">
         <div class="listing-group-head"><h2>${cfg.introHeading}</h2></div>
-        <p class="mode-panel-desc">${course.summary}</p>
-        <div class="detail-media"></div>
+        <div class="tab-group-wrap">
+          <div class="tab-group" data-tab-group>${tabsHTML}</div>
+        </div>
+        ${panelsHTML}
       </section>
-      ${renderCourseModeCTA()}
     </div>`;
   }
   if(cfg.type === 'online-info'){
