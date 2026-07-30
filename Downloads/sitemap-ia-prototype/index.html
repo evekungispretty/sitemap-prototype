@@ -594,8 +594,8 @@ const MENU_DATA = {
       {heading:'認識我們', items:[
         {text:'什麼是 Science of Reading (SoR)', url:'/about-sor', tag:'改名', note:'選單多加註「(SoR)」／頁面標題「什麼是 Science of Reading」'},
         {text:'認識創辦人', url:'/founder', tag:'改名', note:'選單「認識創辦人」／頁面標題「創辦人介紹:蕭文乾博士」'},
-         {text:'教材展示中心', url:'/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
-        {text:'閱讀聽力檢測中心', url:'/reading-assessment-center#reading-assessment', tag:'待確認', note:'sitemap 無對應頁面；併入「教材展示中心」頁面，以錨點連結至頁內「閱讀檢測」區塊'},
+        {text:'SoR 認證架構', url:'/sor-cert', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面'},
+        {text:'閱讀檢測中心', url:'/reading-assessment-center', tag:'待確認', note:'sitemap 無對應頁面，為新增頁面；原規劃併入「教材展示中心」頁面之錨點區塊，現獨立為專屬頁面'},
       ]}
     ]
   },
@@ -811,8 +811,10 @@ const EXTRA_PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('線上方案')]},
   '/kids/online': {label:'線上課程', heroTitle:'線上課程',
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('線上課程')]},
-  '/reading-assessment-center': {label:'教材展示中心', heroTitle:'教材展示中心',
-    crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教材展示中心')]},
+  '/reading-assessment-center': {label:'閱讀檢測中心', heroTitle:'閱讀檢測中心',
+    crumbs:[c('/','首頁'), cur('認識我們'), cur('閱讀檢測中心')]},
+  '/sor-cert': {label:'SoR 認證架構', heroTitle:'SoR 認證架構',
+    crumbs:[c('/','首頁'), cur('認識我們'), cur('SoR 認證架構')]},
   '/adults/highlights': {label:'高光時刻', heroTitle:'高光時刻',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('高光時刻')]},
 
@@ -998,8 +1000,7 @@ const LISTING_SECTIONS = {
     courseKeys:['phonics','vocabulary','reading'],
     cta:{text:'查看所有兒童學程', url:'/kids'},
   },
-  '/reading-assessment-center': {type:'reading-assessment-center',
-    materialsHeading:'教材', assessmentHeading:'閱讀檢測', assessmentAnchor:'reading-assessment'},
+  '/reading-assessment-center': {type:'gallery', heading:'閱讀檢測', count:4},
   '/adults': {type:'courses', heading:'成人課程', groups:[
     {heading:'語言學習', cards:[
       {title:'發音聽力三秒教', url:'/adults/pronunciation', modes:['工作坊','影音']},
@@ -1379,18 +1380,6 @@ function renderListingExtra(url){
       </div>
     </div>`;
   }
-  if(cfg.type === 'reading-assessment-center'){
-    return `<div class="listing-wrap">
-      <section class="listing-group">
-        <div class="listing-group-head"><h2>${cfg.materialsHeading}</h2></div>
-        <div class="detail-media"></div>
-      </section>
-      <section class="listing-group" id="${cfg.assessmentAnchor}">
-        <div class="listing-group-head"><h2>${cfg.assessmentHeading}</h2></div>
-        <div class="detail-media"></div>
-      </section>
-    </div>`;
-  }
   if(cfg.type === 'contact-info'){
     return `<div class="contact-info-wrap">
       <div class="contact-info-list">
@@ -1440,9 +1429,10 @@ function renderListingExtra(url){
 const SITE_TREE = [
   {u:'/', l:'首頁', children:[
     // /about was removed as a page in sitemap.txt — its former children now sit as flat URLs.
-     {u:'/reading-assessment-center', l:'教材展示中心'},
     {u:'/about-sor', l:'什麼是 Science of Reading'},
     {u:'/founder', l:'創辦人介紹:蕭文乾博士'},
+    {u:'/sor-cert', l:'SoR 認證架構'},
+    {u:'/reading-assessment-center', l:'閱讀檢測中心'},
     {u:'/news', l:'最新消息'},
     {u:'/kids', l:'所有兒童課程', children:[
       {u:'/kids/phonics', l:'SoR 拼讀小達人'},
