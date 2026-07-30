@@ -116,6 +116,25 @@
   .mobile-nav .m-top{font-size:15px;font-weight:700;display:block;margin-bottom:6px;}
   .mobile-nav .m-sub{font-size:13px;color:#555;padding:6px 0 6px 12px;display:block;}
 
+  /* ---------- Footer ---------- */
+  .site-footer{background:var(--dark-2);color:#fff;}
+  .footer-inner{max-width:var(--content-max);margin:0 auto;padding:32px 48px;}
+  .footer-cols{display:flex;flex-wrap:wrap;gap:24px 24px;}
+  .footer-col{width:135px;flex-shrink:0;}
+  .footer-col-title{font-size:14px;font-weight:700;color:#fff;margin:0 0 8px;}
+  .footer-col-link{display:block;font-size:13px;line-height:26px;color:#b3b3b3;white-space:nowrap;}
+  .footer-col-link:hover{color:#fff;text-decoration:underline;}
+  .footer-bottom{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    max-width:var(--content-max);margin:0 auto;padding:18px 48px 32px;
+    border-top:1px solid rgba(255,255,255,.12);font-size:13px;color:#9a9a9a;
+  }
+
+  @media (max-width:1024px){
+    .footer-inner,.footer-bottom{padding-left:20px;padding-right:20px;}
+    .footer-cols{gap:28px 32px;}
+  }
+
   /* ---------- Hero / page template ---------- */
   .hero{
     background:var(--hero-gray);min-height:350px;
@@ -206,6 +225,17 @@
     .listing-grid{grid-template-columns:repeat(2,1fr);}
     .overview-wrap{padding:56px 20px;}
   }
+
+  /* ---------- Contact info (/contact-us) ---------- */
+  .contact-info-wrap{max-width:700px;margin:0 auto;padding:56px 24px 100px;}
+  .contact-info-list{display:flex;flex-direction:column;gap:16px;margin-bottom:44px;}
+  .contact-info-row{display:flex;gap:18px;padding:18px 22px;background:var(--hero-gray);border-radius:12px;}
+  .contact-info-label{font-size:13px;font-weight:700;color:var(--muted);width:96px;flex-shrink:0;}
+  .contact-info-value{font-size:15px;color:var(--text);line-height:1.6;}
+  .contact-info-social-heading{font-size:15px;font-weight:700;margin:0 0 16px;text-align:center;}
+  .contact-info-social{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .contact-info-social a{font-size:14px;font-weight:600;color:var(--dark-2);padding:10px 22px;border:1px solid var(--border-2);border-radius:22px;}
+  .contact-info-social a:hover{background:var(--header-gray);}
 
   /* ---------- Course grid + feature split (/adults landing) ---------- */
   .course-group{margin-bottom:40px;}
@@ -496,6 +526,8 @@
 
 <main id="app"></main>
 
+<footer class="site-footer" id="siteFooter"></footer>
+
 <div class="course-modal-overlay" id="courseModalOverlay" hidden></div>
 
 <script>
@@ -527,6 +559,8 @@ const TOP_NAV = [
 
 // TODO: fill in real LINE official account / add-friend URL
 const LINE_URL = '#';
+// TODO: fill in real social media URLs
+const SOCIAL_URLS = { youtube:'#', facebook:'#', instagram:'#' };
 
 // Mega menu contents. Every item may carry {tag, note} used to auto-build the nav-mapping table.
 const MENU_DATA = {
@@ -781,9 +815,71 @@ const EXTRA_PAGES = {
     crumbs:[c('/','首頁'), c('/kids','兒童課程'), cur('教材展示中心')]},
   '/adults/highlights': {label:'高光時刻', heroTitle:'高光時刻',
     crumbs:[c('/','首頁'), c('/adults','成人課程'), cur('高光時刻')]},
+
+  // Footer-only pages — not part of sitemap.txt, added to support footer links.
+  '/contact-us': {label:'聯絡我們', heroTitle:'聯絡我們',
+    crumbs:[c('/','首頁'), cur('聯絡我們')]},
+  '/support/privacy': {label:'隱私權政策', heroTitle:'隱私權政策',
+    crumbs:[c('/','首頁'), cur('隱私權政策')]},
+  '/support/terms': {label:'服務條款', heroTitle:'服務條款',
+    crumbs:[c('/','首頁'), cur('服務條款')]},
+  '/support/anti-fraud': {label:'反詐騙聲明', heroTitle:'反詐騙聲明',
+    crumbs:[c('/','首頁'), cur('反詐騙聲明')]},
 };
 
 const ALL_PAGES = Object.assign({}, PAGES, EXTRA_PAGES);
+
+// Footer link columns, per the footer wireframe. Most columns reuse URLs already
+// established above; only the 「聯絡我們」 and 「蕭博士 SoR 美語」 columns are footer-only
+// and needed new destinations (social links, /contact-us, /support/*).
+const FOOTER_DATA = [
+  {title:'兒童線上', items:[
+    {text:'SoR 拼讀小達人', url:'/kids/phonics'},
+    {text:'SoR 造句小達人', url:'/kids/vocabulary'},
+    {text:'SoR 閱讀小達人', url:'/kids/reading'},
+  ]},
+  {title:'兒童教室', items:[
+    {text:'臺北旗艦殿', url:'/locations/taipei'},
+    {text:'桃園旗艦殿', url:'/locations/taoyuan'},
+    {text:'彰化旗艦殿', url:'/locations/changhua'},
+    {text:'高雄旗艦殿', url:'/locations/kaohsiung'},
+  ]},
+  {title:'成人線上', items:[
+    {text:'發音聽力三秒教', url:'/adults/pronunciation'},
+    {text:'發音聽力矯正班', url:'/adults/adult-pronunciation'},
+    {text:'大師班', url:'/adults/teacher-training'},
+    {text:'文化班', url:'/adults/culture'},
+  ]},
+  {title:'就業培訓', items:[
+    {text:'師資培訓', url:'/adults/teacher-training'},
+  ]},
+  {title:'最新消息', items:[
+    {text:'熱門課程', url:'/news/courses'},
+    {text:'學員見證', url:'/blog/testimonials/kids'},
+    {text:'媒體報導', url:'/blog/media'},
+    {text:'免費資源', url:'/resources'},
+  ]},
+  {title:'精選教材', items:[
+    {text:'SoR 教材', url:'/shop'},
+    {text:'背單字工具組', url:'/vocab-toolkit'},
+    {text:'點讀專區', url:'/mi-pen'},
+    {text:'勘誤專區', url:'/support/errata'},
+  ]},
+  {title:'聯絡我們', items:[
+    {text:'官方 LINE 客服', url:LINE_URL, external:true},
+    {text:'YouTube', url:SOCIAL_URLS.youtube, external:true},
+    {text:'Facebook', url:SOCIAL_URLS.facebook, external:true},
+    {text:'Instagram', url:SOCIAL_URLS.instagram, external:true},
+    {text:'聯絡我們', url:'/contact-us'},
+  ]},
+  {title:'蕭博士 SoR 美語', items:[
+    {text:'關於我們', url:'/about-sor'},
+    {text:'常見問題', url:'/kids/faq'},
+    {text:'隱私權政策', url:'/support/privacy'},
+    {text:'服務條款', url:'/support/terms'},
+    {text:'反詐騙聲明', url:'/support/anti-fraud'},
+  ]},
+];
 
 // Shared course framework content — single source of truth for both the /kids/* detail
 // pages and the /locations/[city] "了解更多" modal, so the two never drift out of sync.
@@ -829,6 +925,20 @@ const LISTING_SECTIONS = {
     {title:'成人學習資源', url:'/resources/adults'},
     {title:'兒童學習資源', url:'/resources/kids'},
   ]},
+  '/contact-us': {type:'contact-info',
+    rows:[
+      {label:'客服電話', value:'(02) 2345-6789'},
+      {label:'電子信箱', value:'service@sor-english.com'},
+      {label:'總部地址', value:'台北市大安區敦化南路二段 100 號 5 樓'},
+      {label:'服務時間', value:'週一至週五 09:00–18:00（國定假日除外）'},
+    ],
+    socialHeading:'追蹤我們',
+    social:[
+      {text:'官方 LINE 客服', url:LINE_URL},
+      {text:'YouTube', url:SOCIAL_URLS.youtube},
+      {text:'Facebook', url:SOCIAL_URLS.facebook},
+      {text:'Instagram', url:SOCIAL_URLS.instagram},
+    ]},
   '/locations': {type:'locations-overview', cards:[
     {title:'台北旗艦殿', url:'/locations/taipei'},
     {title:'桃園旗艦殿', url:'/locations/taoyuan'},
@@ -1281,6 +1391,22 @@ function renderListingExtra(url){
       </section>
     </div>`;
   }
+  if(cfg.type === 'contact-info'){
+    return `<div class="contact-info-wrap">
+      <div class="contact-info-list">
+        ${cfg.rows.map(r=>`
+          <div class="contact-info-row">
+            <span class="contact-info-label">${r.label}</span>
+            <span class="contact-info-value">${r.value}</span>
+          </div>
+        `).join('')}
+      </div>
+      <h2 class="contact-info-social-heading">${cfg.socialHeading}</h2>
+      <div class="contact-info-social">
+        ${cfg.social.map(s=>`<a href="${s.url}" target="_blank" rel="noopener">${s.text}</a>`).join('')}
+      </div>
+    </div>`;
+  }
   if(cfg.type === 'location-detail'){
     return `<div class="listing-wrap">
       <section class="listing-group">
@@ -1374,6 +1500,7 @@ const megaPanelEl = document.getElementById('megaPanel');
 const mobileNavEl = document.getElementById('mobileNav');
 const navToggleBtn = document.getElementById('navToggle');
 const siteHeaderEl = document.getElementById('siteHeader');
+const siteFooterEl = document.getElementById('siteFooter');
 
 function buildTopNav(){
   navListEl.innerHTML = TOP_NAV.map(item=>{
@@ -1491,6 +1618,27 @@ function buildMobileNav(){
   }).join('');
 }
 navToggleBtn.addEventListener('click', ()=>{ mobileNavEl.hidden = !mobileNavEl.hidden; });
+
+function buildFooter(){
+  const colsHTML = FOOTER_DATA.map(col=>`
+    <div class="footer-col">
+      <p class="footer-col-title">${col.title}</p>
+      ${col.items.map(it=>it.external
+        ? `<a class="footer-col-link" href="${it.url}" target="_blank" rel="noopener">${it.text}</a>`
+        : `<a class="footer-col-link" href="#${it.url}">${it.text}</a>`).join('')}
+    </div>
+  `).join('');
+  const year = new Date().getFullYear();
+  siteFooterEl.innerHTML = `
+    <div class="footer-inner">
+      <div class="footer-cols">${colsHTML}</div>
+    </div>
+    <div class="footer-bottom">
+      <span>© ${year} 蕭博士 SoR 美語．All rights reserved.</span>
+      <span>最專業的美語教育｜腦科學實證｜SoR 教學系統</span>
+    </div>
+  `;
+}
 
 function updateActiveNav(url){
   const map = [
@@ -1814,6 +1962,7 @@ function route(){
 
 buildTopNav();
 buildMobileNav();
+buildFooter();
 wireNavInteractions();
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', route);
